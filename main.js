@@ -2305,45 +2305,7 @@ const MathAnalyzer = {
 };
 
 // Enhanced Results Display System
-const ResultsDisplay = {
-    init() {
-        this.createOverlay();
-        this.createStyles();
-    },
-
-    createOverlay() {
-        const overlay = document.createElement('div');
-        overlay.id = 'quiz-overlay';
-        overlay.innerHTML = `
-            <div class="results-container">
-                <div class="results-header">
-                    <h2>Quiz Analysis Results</h2>
-                    <button class="close-btn">×</button>
-                </div>
-                <div class="results-content">
-                    <div class="math-section">
-                        <h3>Mathematical Analysis</h3>
-                        <div class="math-steps"></div>
-                    </div>
-                    <div class="image-section">
-                        <h3>Image Analysis</h3>
-                        <div class="image-results"></div>
-                    </div>
-                    <div class="answer-section">
-                        <h3>Final Answer</h3>
-                        <div class="final-answer"></div>
-                    </div>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(overlay);
-
-        // Add event listeners
-        overlay.querySelector('.close-btn').onclick = () => {
-            overlay.style.display = 'none';
-        };
-    },
-
+Object.assign(ResultsDisplay, {
     createStyles() {
         const styles = document.createElement('style');
         styles.textContent = `
@@ -2353,51 +2315,184 @@ const ResultsDisplay = {
                 right: 0;
                 width: 400px;
                 height: 100%;
-                background: rgba(0, 0, 0, 0.9);
+                background: rgba(0, 0, 0, 0.95);
                 color: #00ff00;
-                font-family: monospace;
+                font-family: 'Courier New', monospace;
                 padding: 20px;
-                box-shadow: -2px 0 10px rgba(0, 255, 0, 0.3);
+                box-shadow: -2px 0 20px rgba(0, 255, 0, 0.4);
                 overflow-y: auto;
                 z-index: 9999;
+                border-left: 2px solid #00ff00;
+                transition: all 0.3s ease;
             }
             .results-container {
                 height: 100%;
+                display: flex;
+                flex-direction: column;
             }
             .results-header {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                border-bottom: 1px solid #00ff00;
-                padding-bottom: 10px;
+                border-bottom: 2px solid #00ff00;
+                padding-bottom: 15px;
                 margin-bottom: 20px;
+                position: sticky;
+                top: 0;
+                background: rgba(0, 0, 0, 0.95);
+                z-index: 1;
+            }
+            .results-header h2 {
+                margin: 0;
+                font-size: 1.5em;
+                text-shadow: 0 0 10px #00ff00;
             }
             .close-btn {
                 background: none;
-                border: none;
+                border: 2px solid #00ff00;
                 color: #00ff00;
-                font-size: 24px;
+                font-size: 20px;
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
                 cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s ease;
+            }
+            .close-btn:hover {
+                background: #00ff00;
+                color: #000;
+                transform: rotate(180deg);
             }
             .results-content > div {
-                margin-bottom: 20px;
-                padding: 10px;
+                margin-bottom: 25px;
+                padding: 15px;
                 border: 1px solid #00ff00;
-                border-radius: 5px;
+                border-radius: 10px;
+                background: rgba(0, 255, 0, 0.05);
+                transition: all 0.3s ease;
+            }
+            .results-content > div:hover {
+                background: rgba(0, 255, 0, 0.1);
+                transform: translateX(-5px);
             }
             .math-steps, .image-results, .final-answer {
-                padding: 10px;
-                background: rgba(0, 255, 0, 0.1);
+                padding: 15px;
+                background: rgba(0, 255, 0, 0.05);
+                border-radius: 8px;
             }
             .step {
-                margin: 10px 0;
-                padding: 5px;
+                margin: 15px 0;
+                padding: 10px;
                 border-left: 3px solid #00ff00;
+                animation: slideIn 0.5s ease;
+            }
+            .step-description {
+                color: #00ff00;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+            .step-expression {
+                font-family: 'Computer Modern', serif;
+                padding: 5px;
+                background: rgba(0, 255, 0, 0.1);
+                border-radius: 4px;
             }
             .confidence {
-                height: 20px;
+                height: 4px;
                 background: linear-gradient(to right, #00ff00, transparent);
-                margin: 5px 0;
+                margin: 10px 0;
+                border-radius: 2px;
+                position: relative;
+                overflow: hidden;
+            }
+            .confidence::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.5), transparent);
+                animation: shine 2s infinite;
+            }
+            .answer {
+                text-align: center;
+                padding: 20px;
+                border: 2px solid #00ff00;
+                border-radius: 10px;
+                margin-top: 20px;
+                position: relative;
+                overflow: hidden;
+            }
+            .answer::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle, rgba(0, 255, 0, 0.1) 0%, transparent 70%);
+                animation: pulse 2s infinite;
+            }
+            .answer h4 {
+                margin: 0;
+                font-size: 1.2em;
+                color: #00ff00;
+                text-shadow: 0 0 5px #00ff00;
+            }
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateX(-20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+            @keyframes shine {
+                0% { transform: translateX(-100%); }
+                100% { transform: translateX(100%); }
+            }
+            @keyframes pulse {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            .math-section h3, .image-section h3, .answer-section h3 {
+                color: #00ff00;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                text-align: center;
+                margin-bottom: 15px;
+                text-shadow: 0 0 5px #00ff00;
+            }
+            .image-data {
+                display: grid;
+                gap: 10px;
+            }
+            .image-data p {
+                margin: 0;
+                padding: 8px;
+                background: rgba(0, 255, 0, 0.05);
+                border-radius: 4px;
+                border-left: 3px solid #00ff00;
+            }
+            .export-btn {
+                background: none;
+                border: 1px solid #00ff00;
+                color: #00ff00;
+                padding: 8px 15px;
+                border-radius: 5px;
+                cursor: pointer;
+                margin-top: 15px;
+                transition: all 0.3s ease;
+            }
+            .export-btn:hover {
+                background: #00ff00;
+                color: #000;
             }
         `;
         document.head.appendChild(styles);
@@ -2407,36 +2502,59 @@ const ResultsDisplay = {
         const overlay = document.getElementById('quiz-overlay');
         overlay.style.display = 'block';
 
-        // Update math steps
+        // Update math steps with animations
         const mathSteps = overlay.querySelector('.math-steps');
-        mathSteps.innerHTML = results.mathSteps.map(step => `
-            <div class="step">
+        mathSteps.innerHTML = results.mathSteps.map((step, index) => `
+            <div class="step" style="animation-delay: ${index * 0.1}s">
                 <div class="step-description">${step.description}</div>
                 <div class="step-expression">${step.expression}</div>
             </div>
         `).join('');
 
-        // Update image results
+        // Update image results with enhanced layout
         const imageResults = overlay.querySelector('.image-results');
         imageResults.innerHTML = `
             <div class="image-data">
-                <p>Detected Text: ${results.imageText}</p>
-                <p>Detected Shapes: ${results.shapes.join(', ')}</p>
-                <p>Color Analysis: ${JSON.stringify(results.colors)}</p>
+                <p><strong>📝 Detected Text:</strong> ${results.imageText}</p>
+                <p><strong>⚪ Shapes:</strong> ${results.shapes.join(', ') || 'None detected'}</p>
+                <p><strong>🎨 Colors:</strong> ${JSON.stringify(results.colors)}</p>
+                <p><strong>📊 Analysis Type:</strong> ${results.mathType}</p>
             </div>
         `;
 
-        // Update final answer
+        // Update final answer with animations
         const finalAnswer = overlay.querySelector('.final-answer');
         finalAnswer.innerHTML = `
             <div class="answer">
-                <h4>Answer: ${results.answer}</h4>
+                <h4>Final Answer</h4>
                 <div class="confidence" style="width: ${results.confidence * 100}%"></div>
+                <p>${results.answer}</p>
                 <p>Confidence: ${Math.round(results.confidence * 100)}%</p>
+                <button class="export-btn" onclick="this.exportResults()">Export Results</button>
             </div>
         `;
+    },
+
+    exportResults() {
+        // Implement export functionality
+        const data = {
+            timestamp: new Date().toISOString(),
+            results: this.currentResults,
+            meta: {
+                version: '2.0',
+                type: 'quiz-analysis'
+            }
+        };
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `quiz-analysis-${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
     }
-};
+});
 
 // Advanced College Mathematics System
 const CollegeMathAnalyzer = {
@@ -2697,3 +2815,412 @@ Object.assign(QuizAnalyzer, {
         return results;
     }
 });
+
+// Advanced Security System
+const SecuritySystem = {
+    // Initialize security measures
+    init() {
+        this.setupAntiDetection();
+        this.hideFromDebugger();
+        this.obfuscateMemory();
+        this.setupProxyTraps();
+        this.initializeStealth();
+    },
+
+    // Anti-detection measures
+    setupAntiDetection() {
+        // Override key detection methods
+        Object.defineProperty(navigator, 'webdriver', {
+            get: () => false
+        });
+        Object.defineProperty(navigator, 'userAgent', {
+            get: () => this.generateRandomUA()
+        });
+        Object.defineProperty(navigator, 'platform', {
+            get: () => this.getRandomPlatform()
+        });
+        Object.defineProperty(navigator, 'hardwareConcurrency', {
+            get: () => Math.floor(Math.random() * 8) + 4
+        });
+        Object.defineProperty(navigator, 'deviceMemory', {
+            get: () => Math.floor(Math.random() * 8) + 4
+        });
+
+        // Mask canvas fingerprinting
+        const originalGetContext = HTMLCanvasElement.prototype.getContext;
+        HTMLCanvasElement.prototype.getContext = function() {
+            const context = originalGetContext.apply(this, arguments);
+            if (context && context.toString() === '[object CanvasRenderingContext2D]') {
+                return new Proxy(context, {
+                    get: (target, prop) => {
+                        if (prop === 'getImageData') {
+                            return function() {
+                                const imageData = target[prop].apply(target, arguments);
+                                // Add subtle noise to prevent fingerprinting
+                                for (let i = 0; i < imageData.data.length; i += 4) {
+                                    imageData.data[i] += (Math.random() - 0.5) * 0.01;
+                                }
+                                return imageData;
+                            };
+                        }
+                        return target[prop];
+                    }
+                });
+            }
+            return context;
+        };
+    },
+
+    // Hide from debugger
+    hideFromDebugger() {
+        const handler = {
+            get: (target, prop) => {
+                if (prop === 'toString') {
+                    return () => '[native code]';
+                }
+                return target[prop];
+            }
+        };
+
+        // Proxy all toolkit functions
+        const proxyFunction = (fn) => new Proxy(fn, handler);
+        Object.keys(this).forEach(key => {
+            if (typeof this[key] === 'function') {
+                this[key] = proxyFunction(this[key]);
+            }
+        });
+
+        // Hide stack traces
+        Error.stackTraceLimit = 0;
+        Error.prepareStackTrace = () => '';
+    },
+
+    // Memory obfuscation
+    obfuscateMemory() {
+        // Encrypt sensitive data in memory
+        const encrypt = (data) => {
+            const key = crypto.getRandomValues(new Uint8Array(32));
+            return { data: this.xorEncrypt(data, key), key };
+        };
+
+        // Store data in fragmented memory
+        this.memoryFragments = new Map();
+        this.storeSecurely = (data) => {
+            const { data: encrypted, key } = encrypt(data);
+            const id = crypto.randomUUID();
+            this.memoryFragments.set(id, { encrypted, key });
+            return id;
+        };
+    },
+
+    // Proxy traps for access control
+    setupProxyTraps() {
+        const createSecureProxy = (target) => {
+            return new Proxy(target, {
+                get: (obj, prop) => {
+                    // Randomize timing to prevent timing attacks
+                    const delay = Math.random() * 10;
+                    return new Promise(resolve => {
+                        setTimeout(() => {
+                            resolve(obj[prop]);
+                        }, delay);
+                    });
+                },
+                set: (obj, prop, value) => {
+                    // Encrypt values before storage
+                    obj[prop] = this.storeSecurely(value);
+                    return true;
+                }
+            });
+        };
+
+        // Apply proxy to all sensitive objects
+        this.secureObjects = new Map();
+        this.createSecureObject = (data) => {
+            const proxy = createSecureProxy(data);
+            this.secureObjects.set(proxy, data);
+            return proxy;
+        };
+    },
+
+    // Stealth mode initialization
+    initializeStealth() {
+        // Override console methods
+        const originalConsole = { ...console };
+        Object.keys(console).forEach(key => {
+            if (typeof console[key] === 'function') {
+                console[key] = (...args) => {
+                    // Filter out toolkit-related logs
+                    if (!args.some(arg => 
+                        String(arg).includes('canvas') || 
+                        String(arg).includes('quiz') ||
+                        String(arg).includes('analysis'))) {
+                        originalConsole[key].apply(console, args);
+                    }
+                };
+            }
+        });
+
+        // Hide from DevTools
+        setInterval(() => {
+            const devtools = /./;
+            devtools.toString = () => {
+                this.hideAllTraces();
+                return '[native code]';
+            };
+        }, 500);
+    },
+
+    // Clean up all traces
+    hideAllTraces() {
+        // Clear performance marks
+        if (window.performance && performance.getEntriesByType) {
+            performance.getEntriesByType('mark').forEach(mark => {
+                performance.clearMarks(mark.name);
+            });
+        }
+
+        // Clear storage
+        localStorage.clear();
+        sessionStorage.clear();
+
+        // Clear cookies
+        document.cookie.split(';').forEach(cookie => {
+            document.cookie = cookie.replace(/^ +/, '').replace(/=.*/, 
+                '=;expires=' + new Date().toUTCString() + ';path=/');
+        });
+    },
+
+    // Helper methods
+    generateRandomUA() {
+        const uas = [
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15',
+            'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36'
+        ];
+        return uas[Math.floor(Math.random() * uas.length)];
+    },
+
+    getRandomPlatform() {
+        return ['MacIntel', 'Win32', 'Linux x86_64'][Math.floor(Math.random() * 3)];
+    },
+
+    xorEncrypt(data, key) {
+        if (typeof data !== 'string') {
+            data = JSON.stringify(data);
+        }
+        const encrypted = new Uint8Array(data.length);
+        for (let i = 0; i < data.length; i++) {
+            encrypted[i] = data.charCodeAt(i) ^ key[i % key.length];
+        }
+        return encrypted;
+    }
+};
+
+// Initialize security system
+SecuritySystem.init();
+
+// Enhance QuizAnalyzer with security
+Object.assign(QuizAnalyzer, {
+    async init() {
+        // Initialize with security measures
+        SecuritySystem.init();
+        
+        // Secure initialization of components
+        await Promise.all([
+            this.secureInit(MathAnalyzer),
+            this.secureInit(CollegeMathAnalyzer),
+            this.secureInit(ResultsDisplay)
+        ]);
+        
+        // Add patterns through secure proxy
+        const securePatterns = SecuritySystem.createSecureObject(new Map([
+            ['calculus', /∫|∂|∇|lim|∑/g],
+            ['linear_algebra', /matrix|eigen|vector/gi],
+            ['complex_analysis', /∮|∂z|∂z̄/g]
+        ]));
+        
+        this.patterns = securePatterns;
+        this.isActive = true;
+    },
+
+    async secureInit(component) {
+        // Create secure proxy for component
+        const secureComponent = SecuritySystem.createSecureObject(component);
+        await secureComponent.init();
+        return secureComponent;
+    }
+});
+
+// Advanced Auto-Detection and Solution System
+const AutoSolver = {
+    init() {
+        this.setupDetectors();
+        this.initSolutionEngine();
+        this.setupBypass();
+    },
+
+    setupDetectors() {
+        // Monitor DOM changes for quiz content
+        const observer = new MutationObserver(mutations => {
+            mutations.forEach(mutation => {
+                if (this.isQuizContent(mutation.target)) {
+                    this.processQuizContent(mutation.target);
+                }
+            });
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true
+        });
+    },
+
+    isQuizContent(element) {
+        return element.classList?.contains('quiz-content') ||
+               element.classList?.contains('question') ||
+               element.querySelector('.quiz-content, .question');
+    },
+
+    async processQuizContent(element) {
+        const questions = this.extractQuestions(element);
+        const solutions = await this.solveQuestions(questions);
+        this.injectSolutions(solutions);
+        this.saveToStorage(solutions);
+    },
+
+    extractQuestions(element) {
+        const questions = [];
+        const questionElements = element.querySelectorAll('.question, .problem');
+        
+        questionElements.forEach(q => {
+            const text = q.textContent;
+            const images = Array.from(q.querySelectorAll('img')).map(img => img.src);
+            const type = this.detectQuestionType(text);
+            questions.push({ text, images, type });
+        });
+
+        return questions;
+    },
+
+    detectQuestionType(text) {
+        const patterns = {
+            calculus: /∫|∂|∇|lim|dx|dy/,
+            algebra: /solve|equation|polynomial|factor/i,
+            geometry: /triangle|circle|angle|polygon/i,
+            statistics: /probability|mean|median|variance/i,
+            vectors: /vector|cross product|dot product/i
+        };
+
+        for (const [type, pattern] of Object.entries(patterns)) {
+            if (pattern.test(text)) return type;
+        }
+        
+        return 'general';
+    },
+
+    async solveQuestions(questions) {
+        return Promise.all(questions.map(async q => {
+            const solution = await this.generateSolution(q);
+            return {
+                question: q,
+                solution: solution,
+                steps: solution.steps,
+                confidence: solution.confidence
+            };
+        }));
+    },
+
+    async generateSolution(question) {
+        const { text, type } = question;
+        let solution;
+
+        switch(type) {
+            case 'calculus':
+                solution = await this.solveCalculus(text);
+                break;
+            case 'algebra':
+                solution = await this.solveAlgebra(text);
+                break;
+            case 'geometry':
+                solution = await this.solveGeometry(text);
+                break;
+            default:
+                solution = await this.solveGeneral(text);
+        }
+
+        return {
+            ...solution,
+            confidence: this.calculateConfidence(solution)
+        };
+    },
+
+    setupBypass() {
+        // Tab Detection Bypass
+        Object.defineProperty(document, 'hidden', {
+            get: () => false
+        });
+        Object.defineProperty(document, 'visibilityState', {
+            get: () => 'visible'
+        });
+
+        // Split Screen Detection Bypass
+        Object.defineProperty(window, 'outerHeight', {
+            get: () => window.innerHeight
+        });
+        Object.defineProperty(window, 'outerWidth', {
+            get: () => window.innerWidth
+        });
+
+        // Kiosk Mode Emulation
+        if (window.navigator) {
+            Object.defineProperty(navigator, 'userAgent', {
+                get: () => 'Mozilla/5.0 (iPad; CPU OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1'
+            });
+        }
+
+        // Activity Simulation
+        setInterval(() => {
+            this.simulateActivity();
+        }, Math.random() * 5000 + 2000);
+    },
+
+    simulateActivity() {
+        const events = ['mousemove', 'scroll', 'keypress'];
+        const randomEvent = events[Math.floor(Math.random() * events.length)];
+        
+        const event = new Event(randomEvent);
+        document.dispatchEvent(event);
+    },
+
+    saveToStorage(solutions) {
+        const encryptedData = SecuritySystem.xorEncrypt(
+            JSON.stringify(solutions),
+            this.getStorageKey()
+        );
+        
+        // Store in fragmented form
+        const fragments = this.fragmentData(encryptedData);
+        fragments.forEach((fragment, index) => {
+            const key = `_${Math.random().toString(36).substr(2, 9)}`;
+            localStorage.setItem(key, fragment);
+        });
+    },
+
+    fragmentData(data) {
+        const fragments = [];
+        const size = Math.ceil(data.length / 10);
+        for (let i = 0; i < data.length; i += size) {
+            fragments.push(data.slice(i, i + size));
+        }
+        return fragments;
+    },
+
+    getStorageKey() {
+        return crypto.getRandomValues(new Uint8Array(32));
+    }
+};
+
+// Initialize AutoSolver
+AutoSolver.init();
