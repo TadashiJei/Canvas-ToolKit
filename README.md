@@ -1,68 +1,188 @@
-# Secure Canvas Quiz Toolkit
+# Advanced Canvas Toolkit v3.0 🎨
 
-An advanced, security-focused toolkit for Canvas quiz automation.
+A powerful JavaScript toolkit for canvas manipulation, analysis, and educational research. This toolkit provides advanced features for canvas manipulation, performance monitoring, pattern recognition, and debugging capabilities.
 
-## Features
+## 🌟 Features
 
-- Single-line injection script
-- Advanced security measures
-- Automated question processing
-- Gemini API integration
-- Human-like behavior simulation
+### 1. Canvas Analysis
+- Pixel distribution analysis
+- Pattern detection (symmetry, gradients, repeating elements)
+- Feature extraction and analysis
+- Real-time performance metrics
 
-## Security Features
+### 2. Canvas Manipulation
+- Advanced filters:
+  - Grayscale
+  - Blur (configurable radius)
+  - Sharpen
+  - Edge Detection (Sobel)
+  - Pixelate
+  - Glitch effect
+- Pattern recognition
+- Visual effects
 
-- Proxy-based function monitoring
-- Timing attack prevention
-- Obfuscated code execution
-- Token-based verification
-- Anti-detection measures
+### 3. Performance Monitoring
+- Real-time metrics tracking
+- Frame rate analysis
+- Operation timing
+- Performance insights
 
-## Quick Start
+### 4. Advanced Animation System
+- Multiple easing functions
+- Frame-based animations
+- Performance-optimized rendering
+- Animation control (pause/resume/stop)
 
-1. Get your Gemini API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+### 5. Advanced Debugger
+- Breakpoint management
+- Watch expressions
+- Call stack tracking
+- Step-by-step execution
+- Conditional breakpoints
 
-2. Create a browser bookmark and set the URL to this code (copy the entire line):
+### 6. Educational Logging
+- Detailed operation logging
+- Performance insights
+- Educational recommendations
+- Export functionality
+
+## 📚 API Reference
+
+### PerformanceMonitor
 ```javascript
-javascript:(function(){const s=document.createElement('script');s.src='https://raw.githubusercontent.com/tadashijei/Canvas-ToolKit/main/secure-quiz-toolkit.min.js';document.body.appendChild(s)})();
+PerformanceMonitor.start(label)      // Start timing an operation
+PerformanceMonitor.end(label)        // End timing and get duration
+PerformanceMonitor.getMetrics()      // Get all performance metrics
 ```
 
-3. Click the bookmark when you're on a Canvas quiz page
-4. Enter your Gemini API key when prompted
+### CanvasAnalyzer
+```javascript
+CanvasAnalyzer.getPixelDistribution(canvas)  // Analyze pixel color distribution
+CanvasAnalyzer.detectPatterns(canvas)        // Detect visual patterns
+```
 
-## Advanced Usage
+### CanvasManipulator
+```javascript
+CanvasManipulator.applyFilter(canvas, filterType, options)
+```
+Available filters:
+- grayscale
+- blur: `{ radius: number }`
+- sharpen
+- edge: Edge detection
+- pixelate: `{ size: number }`
+- glitch: `{ intensity: number }`
 
-The toolkit includes:
-- Automatic question detection
-- Smart answer processing
-- Random delay injection
-- Anti-automation detection
-- Secure API communication
+### AnimationEngine
+```javascript
+AnimationEngine.createAnimation({
+    duration: number,
+    easing: string,
+    frames: array,
+    onUpdate: function,
+    onComplete: function
+})
 
-## Important Notes
+AnimationEngine.pauseAnimation(id)
+AnimationEngine.resumeAnimation(id)
+AnimationEngine.stopAnimation(id)
+```
 
-1. This toolkit is for **academic research purposes only**
-2. Keep your API key secure and never share it
-3. Use responsibly and in accordance with your institution's policies
-4. The toolkit includes measures to prevent detection, but use at your own risk
+Available easing functions:
+- linear
+- easeInQuad
+- easeOutQuad
+- easeInOutQuad
+- easeInCubic
+- easeOutCubic
+- easeInOutCubic
+- bounce
 
-## Technical Details
+### AdvancedDebugger
+```javascript
+AdvancedDebugger.setBreakpoint(location, condition)
+AdvancedDebugger.addWatch(expression, callback)
+AdvancedDebugger.pause()
+AdvancedDebugger.resume()
+AdvancedDebugger.stepOver()
+AdvancedDebugger.stepInto()
+AdvancedDebugger.stepOut()
+AdvancedDebugger.evaluateExpression(expression)
+```
 
-The toolkit employs several security measures:
-- Code obfuscation
-- Proxy-based function monitoring
-- Timing attack prevention
-- Token-based verification
-- Human behavior simulation
+### EducationalLogger
+```javascript
+EducationalLogger.log(action, details, category)
+EducationalLogger.exportLogs()
+```
 
-## Troubleshooting
+## 🚀 Usage Examples
 
-If the toolkit doesn't work:
-1. Make sure you're on a Canvas quiz page
-2. Check if your API key is valid
-3. Ensure JavaScript is enabled
-4. Try refreshing the page before running
+### Basic Canvas Manipulation
+```javascript
+// Apply a filter to a canvas
+const canvas = document.querySelector('canvas');
+CanvasManipulator.applyFilter(canvas, 'glitch', { intensity: 0.5 });
 
-## Disclaimer
+// Create an animation
+const animationId = AnimationEngine.createAnimation({
+    duration: 1000,
+    easing: 'easeInOutCubic',
+    onUpdate: (progress) => {
+        // Animation frame update
+    },
+    onComplete: () => {
+        console.log('Animation completed');
+    }
+});
+```
 
-This toolkit is created for academic research purposes only. Users are responsible for ensuring compliance with their institution's policies and applicable laws.
+### Using the Debugger
+```javascript
+// Set a breakpoint
+AdvancedDebugger.setBreakpoint('functionName', 'count > 5');
+
+// Add a watch expression
+AdvancedDebugger.addWatch('object.property', (newValue, history) => {
+    console.log(`Value changed to: ${newValue}`);
+});
+
+// Start debugging
+AdvancedDebugger.pause();
+```
+
+### Performance Monitoring
+```javascript
+// Monitor an operation
+PerformanceMonitor.start('operation');
+// ... perform operation
+const duration = PerformanceMonitor.end('operation');
+console.log(`Operation took ${duration}ms`);
+```
+
+## 🔒 Security Features
+
+- Advanced encryption (AES-GCM)
+- Memory protection
+- Network security
+- Anti-debugging measures
+- VM detection
+
+## 📝 Notes
+
+- This toolkit is designed for educational and research purposes
+- Performance may vary based on browser and hardware capabilities
+- Some features require modern browser APIs
+- Security features should be used responsibly
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit pull requests.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙏 Acknowledgments
+
+Created by Tadashi Jei (TadashiJei.com)
