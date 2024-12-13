@@ -24,7 +24,7 @@ An advanced, security-focused toolkit for Canvas quiz automation.
 
 2. Create a browser bookmark and set the URL to this code (copy the entire line):
 ```javascript
-javascript:(function(){const s=document.createElement('script');s.src='https://raw.githubusercontent.com/yourusername/canvas-toolkit/main/secure-quiz-toolkit.min.js';document.body.appendChild(s)})();
+javascript:(function(){const s=document.createElement('script');s.src='https://raw.githubusercontent.com/tadashijei/Canvas-ToolKit/main/secure-quiz-toolkit.min.js';document.body.appendChild(s)})();
 ```
 
 3. Click the bookmark when you're on a Canvas quiz page
