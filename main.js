@@ -1,25 +1,470 @@
 /**
- * Advanced Canvas Toolkit v2.0
+ * Advanced Canvas Toolkit v3.0
  * Created by Tadashi Jei (TadashiJei.com)
  * A powerful toolkit for academic research and canvas manipulation
  * 
- * Usage:
- * 1. Copy this entire script
- * 2. Open browser console (F12)
- * 3. Paste and press Enter
- * 4. Type startQuiz() to begin
- * 
- * Features:
- * - Advanced quiz automation
- * - Canvas manipulation
- * - Security measures
- * - Visual effects
- * 
- * For more tools and updates:
- * Visit: TadashiJei.com
+ * Enhanced Features:
+ * - Advanced Canvas Analysis
+ * - Real-time Performance Monitoring
+ * - Educational Logging System
+ * - Enhanced Security
+ * - Improved Animations
  */
 
 (function() {
+    // Performance Monitoring System
+    const PerformanceMonitor = {
+        metrics: new Map(),
+        startTime: null,
+
+        start(label) {
+            this.metrics.set(label, performance.now());
+        },
+
+        end(label) {
+            const startTime = this.metrics.get(label);
+            const duration = performance.now() - startTime;
+            this.metrics.set(label + '_duration', duration);
+            return duration;
+        },
+
+        getMetrics() {
+            return Object.fromEntries(this.metrics);
+        }
+    };
+
+    // Enhanced Canvas Analysis
+    const CanvasAnalyzer = {
+        getPixelDistribution(canvas) {
+            const ctx = canvas.getContext('2d');
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const distribution = new Map();
+
+            for (let i = 0; i < imageData.data.length; i += 4) {
+                const r = imageData.data[i];
+                const g = imageData.data[i + 1];
+                const b = imageData.data[i + 2];
+                const key = `${r},${g},${b}`;
+                distribution.set(key, (distribution.get(key) || 0) + 1);
+            }
+
+            return distribution;
+        },
+
+        detectPatterns(canvas) {
+            const ctx = canvas.getContext('2d');
+            const patterns = {
+                repeatingElements: 0,
+                symmetry: false,
+                gradients: false
+            };
+
+            // Pattern detection logic
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            patterns.symmetry = this._checkSymmetry(imageData);
+            patterns.gradients = this._checkGradients(imageData);
+            patterns.repeatingElements = this._findRepeatingElements(imageData);
+
+            return patterns;
+        },
+
+        _checkSymmetry(imageData) {
+            const width = imageData.width;
+            const height = imageData.height;
+            const midX = Math.floor(width / 2);
+            
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < midX; x++) {
+                    const leftPixel = this._getPixel(imageData, x, y);
+                    const rightPixel = this._getPixel(imageData, width - 1 - x, y);
+                    if (!this._comparePixels(leftPixel, rightPixel)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        },
+
+        _checkGradients(imageData) {
+            let gradientCount = 0;
+            const width = imageData.width;
+            
+            for (let y = 0; y < imageData.height; y++) {
+                let previousColor = this._getPixel(imageData, 0, y);
+                let gradientStreak = 0;
+                
+                for (let x = 1; x < width; x++) {
+                    const currentColor = this._getPixel(imageData, x, y);
+                    if (this._isGradientTransition(previousColor, currentColor)) {
+                        gradientStreak++;
+                    } else {
+                        if (gradientStreak > 10) gradientCount++;
+                        gradientStreak = 0;
+                    }
+                    previousColor = currentColor;
+                }
+            }
+            
+            return gradientCount > 5;
+        },
+
+        _findRepeatingElements(imageData) {
+            const patterns = new Set();
+            const width = imageData.width;
+            const patchSize = 8;
+            
+            for (let y = 0; y < imageData.height - patchSize; y += patchSize) {
+                for (let x = 0; x < width - patchSize; x += patchSize) {
+                    const patch = this._getPatch(imageData, x, y, patchSize);
+                    patterns.add(this._hashPatch(patch));
+                }
+            }
+            
+            return patterns.size;
+        },
+
+        _getPixel(imageData, x, y) {
+            const index = (y * imageData.width + x) * 4;
+            return {
+                r: imageData.data[index],
+                g: imageData.data[index + 1],
+                b: imageData.data[index + 2],
+                a: imageData.data[index + 3]
+            };
+        },
+
+        _comparePixels(p1, p2, threshold = 5) {
+            return Math.abs(p1.r - p2.r) <= threshold &&
+                   Math.abs(p1.g - p2.g) <= threshold &&
+                   Math.abs(p1.b - p2.b) <= threshold;
+        },
+
+        _isGradientTransition(p1, p2, threshold = 5) {
+            return Math.abs(p1.r - p2.r) <= threshold ||
+                   Math.abs(p1.g - p2.g) <= threshold ||
+                   Math.abs(p1.b - p2.b) <= threshold;
+        },
+
+        _getPatch(imageData, x, y, size) {
+            const patch = new Uint8ClampedArray(size * size * 4);
+            for (let i = 0; i < size; i++) {
+                for (let j = 0; j < size; j++) {
+                    const srcIdx = ((y + i) * imageData.width + (x + j)) * 4;
+                    const destIdx = (i * size + j) * 4;
+                    patch[destIdx] = imageData.data[srcIdx];
+                    patch[destIdx + 1] = imageData.data[srcIdx + 1];
+                    patch[destIdx + 2] = imageData.data[srcIdx + 2];
+                    patch[destIdx + 3] = imageData.data[srcIdx + 3];
+                }
+            }
+            return patch;
+        },
+
+        _hashPatch(patch) {
+            return patch.reduce((hash, val) => ((hash << 5) - hash) + val, 0);
+        }
+    };
+
+    // Canvas Manipulation System
+    const CanvasManipulator = {
+        applyFilter(canvas, filterType, options = {}) {
+            const ctx = canvas.getContext('2d');
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const filtered = this._processFilter(imageData, filterType, options);
+            ctx.putImageData(filtered, 0, 0);
+        },
+
+        _processFilter(imageData, filterType, options) {
+            const filters = {
+                grayscale: this._grayscaleFilter,
+                blur: this._blurFilter,
+                sharpen: this._sharpenFilter,
+                edge: this._edgeDetectionFilter,
+                pixelate: this._pixelateFilter,
+                glitch: this._glitchFilter
+            };
+
+            if (filters[filterType]) {
+                return filters[filterType](imageData, options);
+            }
+            
+            return imageData;
+        },
+
+        _grayscaleFilter(imageData) {
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                data[i] = avg;
+                data[i + 1] = avg;
+                data[i + 2] = avg;
+            }
+            return imageData;
+        },
+
+        _blurFilter(imageData, { radius = 1 }) {
+            const data = imageData.data;
+            const width = imageData.width;
+            const height = imageData.height;
+            const result = new Uint8ClampedArray(data.length);
+
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    let r = 0, g = 0, b = 0, a = 0, count = 0;
+
+                    for (let dy = -radius; dy <= radius; dy++) {
+                        for (let dx = -radius; dx <= radius; dx++) {
+                            const nx = x + dx;
+                            const ny = y + dy;
+
+                            if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                                const i = (ny * width + nx) * 4;
+                                r += data[i];
+                                g += data[i + 1];
+                                b += data[i + 2];
+                                a += data[i + 3];
+                                count++;
+                            }
+                        }
+                    }
+
+                    const i = (y * width + x) * 4;
+                    result[i] = r / count;
+                    result[i + 1] = g / count;
+                    result[i + 2] = b / count;
+                    result[i + 3] = a / count;
+                }
+            }
+
+            imageData.data.set(result);
+            return imageData;
+        },
+
+        _sharpenFilter(imageData) {
+            const data = imageData.data;
+            const width = imageData.width;
+            const height = imageData.height;
+            const result = new Uint8ClampedArray(data.length);
+            const kernel = [
+                0, -1, 0,
+                -1, 5, -1,
+                0, -1, 0
+            ];
+
+            for (let y = 1; y < height - 1; y++) {
+                for (let x = 1; x < width - 1; x++) {
+                    const i = (y * width + x) * 4;
+                    let r = 0, g = 0, b = 0;
+
+                    for (let ky = -1; ky <= 1; ky++) {
+                        for (let kx = -1; kx <= 1; kx++) {
+                            const idx = ((y + ky) * width + (x + kx)) * 4;
+                            const kIdx = (ky + 1) * 3 + (kx + 1);
+                            r += data[idx] * kernel[kIdx];
+                            g += data[idx + 1] * kernel[kIdx];
+                            b += data[idx + 2] * kernel[kIdx];
+                        }
+                    }
+
+                    result[i] = Math.min(255, Math.max(0, r));
+                    result[i + 1] = Math.min(255, Math.max(0, g));
+                    result[i + 2] = Math.min(255, Math.max(0, b));
+                    result[i + 3] = data[i + 3];
+                }
+            }
+
+            imageData.data.set(result);
+            return imageData;
+        },
+
+        _edgeDetectionFilter(imageData) {
+            const data = imageData.data;
+            const width = imageData.width;
+            const height = imageData.height;
+            const result = new Uint8ClampedArray(data.length);
+            const sobelX = [-1, 0, 1, -2, 0, 2, -1, 0, 1];
+            const sobelY = [-1, -2, -1, 0, 0, 0, 1, 2, 1];
+
+            for (let y = 1; y < height - 1; y++) {
+                for (let x = 1; x < width - 1; x++) {
+                    let gx = 0, gy = 0;
+
+                    for (let ky = -1; ky <= 1; ky++) {
+                        for (let kx = -1; kx <= 1; kx++) {
+                            const idx = ((y + ky) * width + (x + kx)) * 4;
+                            const kIdx = (ky + 1) * 3 + (kx + 1);
+                            const val = (data[idx] + data[idx + 1] + data[idx + 2]) / 3;
+                            gx += val * sobelX[kIdx];
+                            gy += val * sobelY[kIdx];
+                        }
+                    }
+
+                    const i = (y * width + x) * 4;
+                    const magnitude = Math.min(255, Math.sqrt(gx * gx + gy * gy));
+                    result[i] = magnitude;
+                    result[i + 1] = magnitude;
+                    result[i + 2] = magnitude;
+                    result[i + 3] = data[i + 3];
+                }
+            }
+
+            imageData.data.set(result);
+            return imageData;
+        },
+
+        _pixelateFilter(imageData, { size = 10 }) {
+            const data = imageData.data;
+            const width = imageData.width;
+            const height = imageData.height;
+            const result = new Uint8ClampedArray(data.length);
+
+            for (let y = 0; y < height; y += size) {
+                for (let x = 0; x < width; x += size) {
+                    let r = 0, g = 0, b = 0, a = 0, count = 0;
+
+                    for (let dy = 0; dy < size && y + dy < height; dy++) {
+                        for (let dx = 0; dx < size && x + dx < width; dx++) {
+                            const i = ((y + dy) * width + (x + dx)) * 4;
+                            r += data[i];
+                            g += data[i + 1];
+                            b += data[i + 2];
+                            a += data[i + 3];
+                            count++;
+                        }
+                    }
+
+                    r = Math.round(r / count);
+                    g = Math.round(g / count);
+                    b = Math.round(b / count);
+                    a = Math.round(a / count);
+
+                    for (let dy = 0; dy < size && y + dy < height; dy++) {
+                        for (let dx = 0; dx < size && x + dx < width; dx++) {
+                            const i = ((y + dy) * width + (x + dx)) * 4;
+                            result[i] = r;
+                            result[i + 1] = g;
+                            result[i + 2] = b;
+                            result[i + 3] = a;
+                        }
+                    }
+                }
+            }
+
+            imageData.data.set(result);
+            return imageData;
+        },
+
+        _glitchFilter(imageData, { intensity = 0.1 }) {
+            const data = imageData.data;
+            const width = imageData.width;
+            const height = imageData.height;
+            const result = new Uint8ClampedArray(data.length);
+            result.set(data);
+
+            const numGlitches = Math.floor(height * intensity);
+            for (let i = 0; i < numGlitches; i++) {
+                const y = Math.floor(Math.random() * height);
+                const glitchWidth = Math.floor(Math.random() * width * 0.2);
+                const offset = Math.floor(Math.random() * width * 0.1);
+
+                for (let x = 0; x < width - glitchWidth; x++) {
+                    const srcIdx = (y * width + x) * 4;
+                    const destIdx = (y * width + ((x + offset) % width)) * 4;
+
+                    for (let j = 0; j < 4; j++) {
+                        result[destIdx + j] = data[srcIdx + j];
+                    }
+                }
+            }
+
+            // Color channel shift
+            const channelOffset = Math.floor(width * 0.02);
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const i = (y * width + x) * 4;
+                    if (x < width - channelOffset) {
+                        result[i + 0] = data[i + channelOffset * 4]; // Red channel shift
+                    }
+                }
+            }
+
+            imageData.data.set(result);
+            return imageData;
+        }
+    };
+
+    // Educational Logging System
+    const EducationalLogger = {
+        logs: [],
+        
+        log(action, details, category = 'info') {
+            const logEntry = {
+                timestamp: new Date().toISOString(),
+                action,
+                details,
+                category,
+                performance: PerformanceMonitor.getMetrics()
+            };
+            
+            this.logs.push(logEntry);
+            this._processLog(logEntry);
+            
+            return logEntry;
+        },
+        
+        _processLog(logEntry) {
+            // Analyze patterns and provide educational insights
+            const insights = this._generateInsights(logEntry);
+            if (insights) {
+                console.log('%cEducational Insight:', 'color: #4CAF50; font-weight: bold');
+                console.log(insights);
+            }
+        },
+        
+        _generateInsights(logEntry) {
+            const insights = [];
+            
+            // Pattern analysis
+            if (logEntry.category === 'canvas') {
+                insights.push(this._analyzeCanvasOperation(logEntry));
+            }
+            
+            // Performance analysis
+            if (logEntry.performance) {
+                insights.push(this._analyzePerformance(logEntry.performance));
+            }
+            
+            return insights.filter(Boolean).join('\n');
+        },
+        
+        _analyzeCanvasOperation(logEntry) {
+            const operations = {
+                'draw': 'Drawing operations are fundamental to canvas manipulation. Consider optimization techniques like batch rendering.',
+                'transform': 'Transformations can be computationally expensive. Consider using CSS transforms when possible.',
+                'clear': 'Clearing the canvas is a common operation. Consider using layered canvases for complex animations.'
+            };
+            
+            return operations[logEntry.action] || null;
+        },
+        
+        _analyzePerformance(metrics) {
+            const threshold = 16.67; // 60fps threshold
+            let insight = '';
+            
+            for (const [key, value] of Object.entries(metrics)) {
+                if (key.endsWith('_duration') && value > threshold) {
+                    insight += `\nPerformance Warning: ${key} took ${value.toFixed(2)}ms, which may affect frame rate.`;
+                }
+            }
+            
+            return insight || null;
+        },
+
+        exportLogs() {
+            return JSON.stringify(this.logs, null, 2);
+        }
+    };
+
     // Encryption utilities
     const CryptoUtils = {
         async encrypt(text, key) {
@@ -278,7 +723,7 @@ $$$$P d$$$$F $ $$$$$$$$$- $$$$$$
    /           ,             ,-"     ;
   (,__.--.      \\           /        ;
    //'   /\`--.   |          |        \`._________
-     _.-'_/   )  |          \\_,         \\`--..__\`\`--.
+     _.-'_/   )  |          \\_,         \\\`--..__\`\`--.
    \`"(((\`\`   (((\`\`            \`\`---\`\`\`\`\`\`\`\`\`\`
 `,
 
@@ -366,7 +811,7 @@ $$$$P d$$$$F $ $$$$$$$$$- $$$$$$
    /           ,             ,-"     ;
   (,__.--.      \\           /        ;
    //'   /\`--.   |          |        \`._________
-     _.-'_/   )  |          \\_,         \\`--..__\`\`--.
+     _.-'_/   )  |          \\_,         \\\`--..__\`\`--.
    \`"(((\`\`   (((\`\`            \`\`---\`\`\`\`\`\`\`\`\`\`
 `;
             
@@ -460,6 +905,446 @@ $$$$P d$$$$F $ $$$$$$$$$- $$$$$$
         }
     };
 
+    // Advanced Animation System
+    const AnimationEngine = {
+        animations: new Map(),
+        
+        createAnimation(options) {
+            const id = crypto.randomUUID();
+            const animation = {
+                id,
+                startTime: performance.now(),
+                duration: options.duration || 1000,
+                easing: options.easing || 'linear',
+                frames: options.frames || [],
+                onUpdate: options.onUpdate || (() => {}),
+                onComplete: options.onComplete || (() => {}),
+                status: 'running'
+            };
+            
+            this.animations.set(id, animation);
+            this._startAnimation(animation);
+            
+            return id;
+        },
+        
+        _startAnimation(animation) {
+            const animate = (timestamp) => {
+                if (animation.status !== 'running') return;
+                
+                const progress = Math.min((timestamp - animation.startTime) / animation.duration, 1);
+                const easedProgress = this._applyEasing(progress, animation.easing);
+                
+                PerformanceMonitor.start('animation_frame');
+                animation.onUpdate(easedProgress);
+                PerformanceMonitor.end('animation_frame');
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    animation.status = 'completed';
+                    animation.onComplete();
+                }
+            };
+            
+            requestAnimationFrame(animate);
+        },
+        
+        _applyEasing(progress, easing) {
+            const easingFunctions = {
+                linear: t => t,
+                easeInQuad: t => t * t,
+                easeOutQuad: t => t * (2 - t),
+                easeInOutQuad: t => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
+                easeInCubic: t => t * t * t,
+                easeOutCubic: t => (--t) * t * t + 1,
+                easeInOutCubic: t => t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1,
+                bounce: t => {
+                    if (t < (1/2.75)) {
+                        return 7.5625 * t * t;
+                    } else if (t < (2/2.75)) {
+                        return 7.5625 * (t -= (1.5/2.75)) * t + 0.75;
+                    } else if (t < (2.5/2.75)) {
+                        return 7.5625 * (t -= (2.25/2.75)) * t + 0.9375;
+                    } else {
+                        return 7.5625 * (t -= (2.625/2.75)) * t + 0.984375;
+                    }
+                }
+            };
+            
+            return easingFunctions[easing](progress);
+        },
+        
+        pauseAnimation(id) {
+            const animation = this.animations.get(id);
+            if (animation) animation.status = 'paused';
+        },
+        
+        resumeAnimation(id) {
+            const animation = this.animations.get(id);
+            if (animation && animation.status === 'paused') {
+                animation.startTime = performance.now() - (animation.duration * this._getProgress(animation));
+                animation.status = 'running';
+                this._startAnimation(animation);
+            }
+        },
+        
+        stopAnimation(id) {
+            const animation = this.animations.get(id);
+            if (animation) {
+                animation.status = 'stopped';
+                this.animations.delete(id);
+            }
+        },
+        
+        _getProgress(animation) {
+            return (performance.now() - animation.startTime) / animation.duration;
+        }
+    };
+
+    // Advanced Pattern Recognition
+    const PatternRecognition = {
+        patterns: new Map(),
+        
+        trainPattern(name, samples) {
+            const features = samples.map(this._extractFeatures);
+            this.patterns.set(name, {
+                features,
+                centroid: this._calculateCentroid(features)
+            });
+        },
+        
+        recognizePattern(sample) {
+            const sampleFeatures = this._extractFeatures(sample);
+            let bestMatch = null;
+            let bestDistance = Infinity;
+            
+            for (const [name, pattern] of this.patterns) {
+                const distance = this._calculateDistance(sampleFeatures, pattern.centroid);
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    bestMatch = name;
+                }
+            }
+            
+            return {
+                pattern: bestMatch,
+                confidence: bestDistance < 0.5 ? (1 - bestDistance) * 100 : 0
+            };
+        },
+        
+        _extractFeatures(sample) {
+            // Extract relevant features from the sample
+            // This is a simplified example - expand based on your needs
+            return {
+                size: sample.length,
+                complexity: this._calculateComplexity(sample),
+                entropy: this._calculateEntropy(sample)
+            };
+        },
+        
+        _calculateComplexity(sample) {
+            // Implement complexity calculation
+            // This is a placeholder - implement based on your specific needs
+            return sample.split('').filter((char, index, arr) => 
+                arr.indexOf(char) === index
+            ).length / sample.length;
+        },
+        
+        _calculateEntropy(sample) {
+            const freq = new Map();
+            for (const char of sample) {
+                freq.set(char, (freq.get(char) || 0) + 1);
+            }
+            
+            return Array.from(freq.values()).reduce((entropy, count) => {
+                const p = count / sample.length;
+                return entropy - p * Math.log2(p);
+            }, 0);
+        },
+        
+        _calculateCentroid(features) {
+            // Calculate the average of all feature vectors
+            const sum = features.reduce((acc, feature) => {
+                Object.keys(feature).forEach(key => {
+                    acc[key] = (acc[key] || 0) + feature[key];
+                });
+                return acc;
+            }, {});
+            
+            Object.keys(sum).forEach(key => {
+                sum[key] /= features.length;
+            });
+            
+            return sum;
+        },
+        
+        _calculateDistance(a, b) {
+            // Calculate Euclidean distance between feature vectors
+            return Math.sqrt(
+                Object.keys(a).reduce((sum, key) => {
+                    const diff = a[key] - b[key];
+                    return sum + diff * diff;
+                }, 0)
+            );
+        }
+    };
+
+    // Quiz Automation Methods
+    const QuizAutomation = {
+        async automateQuiz() {
+            try {
+                const questions = await this._scanQuizPage();
+                for (const question of questions) {
+                    await this._processQuestion(question);
+                    await this._addRandomDelay();
+                }
+            } catch (error) {
+                console.error('Quiz automation error:', error);
+            }
+        },
+
+        // Scan quiz page for questions
+        async _scanQuizPage() {
+            const questions = [];
+            const questionElements = document.querySelectorAll('.question_text, .quiz_question');
+            
+            for (const element of questionElements) {
+                const questionData = this._extractQuestionData(element);
+                if (questionData) {
+                    questions.push(questionData);
+                }
+            }
+            
+            return questions;
+        },
+
+        // Extract question data
+        _extractQuestionData(element) {
+            const questionContainer = element.closest('.question, .quiz_question');
+            if (!questionContainer) return null;
+
+            return {
+                id: questionContainer.id,
+                text: element.textContent.trim(),
+                type: this._determineQuestionType(questionContainer),
+                options: this._extractOptions(questionContainer)
+            };
+        },
+
+        // Determine question type
+        _determineQuestionType(container) {
+            if (container.querySelector('input[type="radio"]')) return 'multiple_choice';
+            if (container.querySelector('input[type="checkbox"]')) return 'multiple_answer';
+            if (container.querySelector('textarea')) return 'essay';
+            if (container.querySelector('input[type="text"]')) return 'short_answer';
+            return 'unknown';
+        },
+
+        // Extract answer options
+        _extractOptions(container) {
+            const options = [];
+            const optionElements = container.querySelectorAll('.answer, .answer_text');
+            
+            optionElements.forEach((element, index) => {
+                const input = element.querySelector('input[type="radio"], input[type="checkbox"]');
+                if (input) {
+                    options.push({
+                        index,
+                        text: element.textContent.trim(),
+                        element: input
+                    });
+                }
+            });
+            
+            return options;
+        },
+
+        // Process individual question
+        async _processQuestion(question) {
+            try {
+                const answer = await this._getAnswer(question);
+                await this._fillAnswer(question, answer);
+            } catch (error) {
+                console.error(`Error processing question ${question.id}:`, error);
+            }
+        },
+
+        // Get answer from Gemini API
+        async _getAnswer(question) {
+            // Show visual feedback when processing
+            const questionElement = document.getElementById(question.id);
+            if (questionElement) {
+                questionElement.style.textShadow = '0 0 10px #00ff00';
+                setTimeout(() => {
+                    questionElement.style.textShadow = 'none';
+                }, 1000);
+            }
+
+            const encryptedPrompt = await CryptoUtils.encrypt(
+                this._formatPrompt(question),
+                this.securityToken
+            );
+            
+            try {
+                const response = await this._secureApiCall(encryptedPrompt);
+                return this._parseGeminiResponse(response, question);
+            } catch (error) {
+                console.error('API error:', error);
+                throw error;
+            }
+        },
+
+        // Secure API call
+        async _secureApiCall(encryptedData) {
+            const headers = {
+                'Content-Type': 'application/json',
+                'X-Security-Token': this.securityToken,
+                'X-Client-Version': '2.0',
+                'X-Request-Time': Date.now()
+            };
+
+            const response = await fetch(`${this.GEMINI_API_URL}?key=${this.apiKey}`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{ text: encryptedData }]
+                    }]
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`API call failed: ${response.status}`);
+            }
+
+            return response.json();
+        },
+
+        // Format prompt for Gemini
+        _formatPrompt(question) {
+            let prompt = `Question: ${question.text}\n\n`;
+            
+            if (question.options.length > 0) {
+                prompt += 'Options:\n';
+                question.options.forEach((option, index) => {
+                    prompt += `${index + 1}. ${option.text}\n`;
+                });
+            }
+
+            prompt += '\nProvide the best answer based on the question type. ';
+            prompt += 'For multiple choice, specify the number. For text answers, provide a concise response.';
+            
+            return prompt;
+        },
+
+        // Parse Gemini API response
+        _parseGeminiResponse(response, question) {
+            try {
+                const answer = response.candidates[0].content.parts[0].text;
+                
+                if (question.type === 'multiple_choice' || question.type === 'multiple_answer') {
+                    const numberMatch = answer.match(/\d+/);
+                    return numberMatch ? parseInt(numberMatch[0]) - 1 : null;
+                }
+                
+                return answer;
+            } catch (error) {
+                console.error('Error parsing Gemini response:', error);
+                return null;
+            }
+        },
+
+        // Fill in the answer
+        async _fillAnswer(question, answer) {
+            if (answer === null) return;
+
+            switch (question.type) {
+                case 'multiple_choice':
+                case 'multiple_answer':
+                    if (typeof answer === 'number' && question.options[answer]) {
+                        await this._simulateHumanClick(question.options[answer].element);
+                    }
+                    break;
+
+                case 'essay':
+                case 'short_answer':
+                    const input = document.querySelector(`#${question.id} textarea, #${question.id} input[type="text"]`);
+                    if (input) {
+                        await this._simulateHumanTyping(input, answer);
+                    }
+                    break;
+            }
+        },
+
+        // Simulate human clicking
+        async _simulateHumanClick(element) {
+            if (!element) return;
+
+            const rect = element.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+
+            // Mouse move
+            const moveEvent = new MouseEvent('mousemove', {
+                bubbles: true,
+                clientX: x,
+                clientY: y
+            });
+            element.dispatchEvent(moveEvent);
+
+            await this._addRandomDelay();
+
+            // Mouse down
+            const downEvent = new MouseEvent('mousedown', {
+                bubbles: true,
+                clientX: x,
+                clientY: y
+            });
+            element.dispatchEvent(downEvent);
+
+            await this._addRandomDelay();
+
+            // Mouse up and click
+            const upEvent = new MouseEvent('mouseup', {
+                bubbles: true,
+                clientX: x,
+                clientY: y
+            });
+            element.dispatchEvent(upEvent);
+            element.click();
+        },
+
+        // Simulate human typing
+        async _simulateHumanTyping(element, text) {
+            if (!element) return;
+
+            element.focus();
+            
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                element.value += char;
+                
+                // Dispatch events
+                element.dispatchEvent(new Event('input', { bubbles: true }));
+                element.dispatchEvent(new KeyboardEvent('keydown', { key: char }));
+                element.dispatchEvent(new KeyboardEvent('keypress', { key: char }));
+                element.dispatchEvent(new KeyboardEvent('keyup', { key: char }));
+                
+                // Random typing delay
+                await new Promise(resolve => setTimeout(resolve, 50 + Math.random() * 150));
+            }
+
+            element.dispatchEvent(new Event('change', { bubbles: true }));
+        },
+
+        // Add random delay to simulate human behavior
+        _addRandomDelay() {
+            const delay = 1000 + Math.random() * 2000;
+            return new Promise(resolve => setTimeout(resolve, delay));
+        }
+    };
+
     class CanvasToolkit {
         constructor(config = {}) {
             this.initializeProtections();
@@ -533,11 +1418,21 @@ $$$$P d$$$$F $ $$$$$$$$$- $$$$$$
 
             return new Proxy(this, {
                 get: (target, prop) => {
-                    if (this.isActionSuspicious()) {
-                        suspiciousActions++;
-                        if (suspiciousActions >= maxSuspiciousActions) {
-                            this.handleSuspiciousActivity();
-                        }
+                    if (typeof target[prop] === 'function') {
+                        return (...args) => {
+                            const start = performance.now();
+                            const result = target[prop].apply(target, args);
+                            
+                            if (result instanceof Promise) {
+                                return result.then(value => {
+                                    this._checkTiming(start);
+                                    return value;
+                                });
+                            }
+                            
+                            this._checkTiming(start);
+                            return result;
+                        };
                     }
                     return target[prop];
                 }
@@ -741,253 +1636,6 @@ $$$$P d$$$$F $ $$$$$$$$$- $$$$$$
             return new Promise(resolve => setTimeout(resolve, delay));
         }
 
-        // Quiz Automation Methods
-        async automateQuiz() {
-            try {
-                const questions = await this._scanQuizPage();
-                for (const question of questions) {
-                    await this._processQuestion(question);
-                    await this._addRandomDelay();
-                }
-            } catch (error) {
-                console.error('Quiz automation error:', error);
-            }
-        }
-
-        // Scan quiz page for questions
-        async _scanQuizPage() {
-            const questions = [];
-            const questionElements = document.querySelectorAll('.question_text, .quiz_question');
-            
-            for (const element of questionElements) {
-                const questionData = this._extractQuestionData(element);
-                if (questionData) {
-                    questions.push(questionData);
-                }
-            }
-            
-            return questions;
-        }
-
-        // Extract question data
-        _extractQuestionData(element) {
-            const questionContainer = element.closest('.question, .quiz_question');
-            if (!questionContainer) return null;
-
-            return {
-                id: questionContainer.id,
-                text: element.textContent.trim(),
-                type: this._determineQuestionType(questionContainer),
-                options: this._extractOptions(questionContainer)
-            };
-        }
-
-        // Determine question type
-        _determineQuestionType(container) {
-            if (container.querySelector('input[type="radio"]')) return 'multiple_choice';
-            if (container.querySelector('input[type="checkbox"]')) return 'multiple_answer';
-            if (container.querySelector('textarea')) return 'essay';
-            if (container.querySelector('input[type="text"]')) return 'short_answer';
-            return 'unknown';
-        }
-
-        // Extract answer options
-        _extractOptions(container) {
-            const options = [];
-            const optionElements = container.querySelectorAll('.answer, .answer_text');
-            
-            optionElements.forEach((element, index) => {
-                const input = element.querySelector('input[type="radio"], input[type="checkbox"]');
-                if (input) {
-                    options.push({
-                        index,
-                        text: element.textContent.trim(),
-                        element: input
-                    });
-                }
-            });
-            
-            return options;
-        }
-
-        // Process individual question
-        async _processQuestion(question) {
-            try {
-                const answer = await this._getAnswer(question);
-                await this._fillAnswer(question, answer);
-            } catch (error) {
-                console.error(`Error processing question ${question.id}:`, error);
-            }
-        }
-
-        // Get answer from Gemini API
-        async _getAnswer(question) {
-            // Show visual feedback when processing
-            const questionElement = document.getElementById(question.id);
-            if (questionElement) {
-                questionElement.style.textShadow = '0 0 10px #00ff00';
-                setTimeout(() => {
-                    questionElement.style.textShadow = 'none';
-                }, 1000);
-            }
-
-            const encryptedPrompt = await CryptoUtils.encrypt(
-                this._formatPrompt(question),
-                this.securityToken
-            );
-            
-            try {
-                const response = await this._secureApiCall(encryptedPrompt);
-                return this._parseGeminiResponse(response, question);
-            } catch (error) {
-                console.error('API error:', error);
-                throw error;
-            }
-        }
-
-        // Secure API call
-        async _secureApiCall(encryptedData) {
-            const headers = {
-                'Content-Type': 'application/json',
-                'X-Security-Token': this.securityToken,
-                'X-Client-Version': '2.0',
-                'X-Request-Time': Date.now()
-            };
-
-            const response = await fetch(`${this.GEMINI_API_URL}?key=${this.apiKey}`, {
-                method: 'POST',
-                headers,
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{ text: encryptedData }]
-                    }]
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`API call failed: ${response.status}`);
-            }
-
-            return response.json();
-        }
-
-        // Format prompt for Gemini
-        _formatPrompt(question) {
-            let prompt = `Question: ${question.text}\n\n`;
-            
-            if (question.options.length > 0) {
-                prompt += 'Options:\n';
-                question.options.forEach((option, index) => {
-                    prompt += `${index + 1}. ${option.text}\n`;
-                });
-            }
-
-            prompt += '\nProvide the best answer based on the question type. ';
-            prompt += 'For multiple choice, specify the number. For text answers, provide a concise response.';
-            
-            return prompt;
-        }
-
-        // Parse Gemini API response
-        _parseGeminiResponse(response, question) {
-            try {
-                const answer = response.candidates[0].content.parts[0].text;
-                
-                if (question.type === 'multiple_choice' || question.type === 'multiple_answer') {
-                    const numberMatch = answer.match(/\d+/);
-                    return numberMatch ? parseInt(numberMatch[0]) - 1 : null;
-                }
-                
-                return answer;
-            } catch (error) {
-                console.error('Error parsing Gemini response:', error);
-                return null;
-            }
-        }
-
-        // Fill in the answer
-        async _fillAnswer(question, answer) {
-            if (answer === null) return;
-
-            switch (question.type) {
-                case 'multiple_choice':
-                case 'multiple_answer':
-                    if (typeof answer === 'number' && question.options[answer]) {
-                        await this._simulateHumanClick(question.options[answer].element);
-                    }
-                    break;
-
-                case 'essay':
-                case 'short_answer':
-                    const input = document.querySelector(`#${question.id} textarea, #${question.id} input[type="text"]`);
-                    if (input) {
-                        await this._simulateHumanTyping(input, answer);
-                    }
-                    break;
-            }
-        }
-
-        // Simulate human clicking
-        async _simulateHumanClick(element) {
-            if (!element) return;
-
-            const rect = element.getBoundingClientRect();
-            const x = rect.left + rect.width / 2;
-            const y = rect.top + rect.height / 2;
-
-            // Mouse move
-            const moveEvent = new MouseEvent('mousemove', {
-                bubbles: true,
-                clientX: x,
-                clientY: y
-            });
-            element.dispatchEvent(moveEvent);
-
-            await this._addRandomDelay();
-
-            // Mouse down
-            const downEvent = new MouseEvent('mousedown', {
-                bubbles: true,
-                clientX: x,
-                clientY: y
-            });
-            element.dispatchEvent(downEvent);
-
-            await this._addRandomDelay();
-
-            // Mouse up and click
-            const upEvent = new MouseEvent('mouseup', {
-                bubbles: true,
-                clientX: x,
-                clientY: y
-            });
-            element.dispatchEvent(upEvent);
-            element.click();
-        }
-
-        // Simulate human typing
-        async _simulateHumanTyping(element, text) {
-            if (!element) return;
-
-            element.focus();
-            
-            for (let i = 0; i < text.length; i++) {
-                const char = text[i];
-                element.value += char;
-                
-                // Dispatch events
-                element.dispatchEvent(new Event('input', { bubbles: true }));
-                element.dispatchEvent(new KeyboardEvent('keydown', { key: char }));
-                element.dispatchEvent(new KeyboardEvent('keypress', { key: char }));
-                element.dispatchEvent(new KeyboardEvent('keyup', { key: char }));
-                
-                // Random typing delay
-                await new Promise(resolve => setTimeout(resolve, 50 + Math.random() * 150));
-            }
-
-            element.dispatchEvent(new Event('change', { bubbles: true }));
-        }
-
         // Initialize visual effects
         initVisualEffects() {
             ASCIIAnimator.startSkullAnimation();
@@ -1001,6 +1649,191 @@ $$$$P d$$$$F $ $$$$$$$$$- $$$$$$
             });
         }
     }
+
+    // Advanced Debugger System
+    const AdvancedDebugger = {
+        breakpoints: new Map(),
+        watches: new Map(),
+        callStack: [],
+        isPaused: false,
+        stepMode: false,
+        
+        setBreakpoint(location, condition = null) {
+            this.breakpoints.set(location, {
+                condition,
+                hits: 0,
+                enabled: true
+            });
+        },
+        
+        addWatch(expression, callback = null) {
+            this.watches.set(expression, {
+                lastValue: undefined,
+                callback,
+                history: []
+            });
+        },
+        
+        pause() {
+            this.isPaused = true;
+            this._logDebugState();
+            debugger; // Native debugger integration
+        },
+        
+        resume() {
+            this.isPaused = false;
+            this.stepMode = false;
+        },
+        
+        stepOver() {
+            this.stepMode = true;
+            this.resume();
+        },
+        
+        stepInto() {
+            this.stepMode = true;
+            this.resume();
+        },
+        
+        stepOut() {
+            if (this.callStack.length > 0) {
+                const currentFrame = this.callStack[this.callStack.length - 1];
+                this._setTemporaryBreakpoint(currentFrame.caller);
+            }
+            this.resume();
+        },
+        
+        evaluateExpression(expression) {
+            try {
+                const result = eval(expression);
+                return {
+                    success: true,
+                    value: result,
+                    type: typeof result
+                };
+            } catch (error) {
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        },
+        
+        _logDebugState() {
+            console.group('Debug State');
+            console.log('Call Stack:', this.callStack);
+            console.log('Breakpoints:', Array.from(this.breakpoints.entries()));
+            console.log('Watches:', Array.from(this.watches.entries()));
+            console.groupEnd();
+        },
+        
+        _setTemporaryBreakpoint(location) {
+            const tempBreakpoint = {
+                condition: null,
+                hits: 0,
+                enabled: true,
+                temporary: true
+            };
+            this.breakpoints.set(location, tempBreakpoint);
+        },
+        
+        _checkBreakpoint(location) {
+            const breakpoint = this.breakpoints.get(location);
+            if (!breakpoint || !breakpoint.enabled) return false;
+            
+            breakpoint.hits++;
+            
+            if (breakpoint.temporary) {
+                this.breakpoints.delete(location);
+            }
+            
+            if (breakpoint.condition) {
+                try {
+                    return eval(breakpoint.condition);
+                } catch {
+                    return false;
+                }
+            }
+            
+            return true;
+        },
+        
+        _updateWatches() {
+            for (const [expression, watch] of this.watches) {
+                try {
+                    const newValue = eval(expression);
+                    if (newValue !== watch.lastValue) {
+                        watch.history.push({
+                            timestamp: Date.now(),
+                            oldValue: watch.lastValue,
+                            newValue
+                        });
+                        watch.lastValue = newValue;
+                        
+                        if (watch.callback) {
+                            watch.callback(newValue, watch.history);
+                        }
+                    }
+                } catch (error) {
+                    console.warn(`Watch expression error: ${expression}`, error);
+                }
+            }
+        },
+        
+        _pushCallFrame(functionName, args, location) {
+            this.callStack.push({
+                function: functionName,
+                arguments: args,
+                location,
+                timestamp: Date.now()
+            });
+        },
+        
+        _popCallFrame() {
+            return this.callStack.pop();
+        }
+    };
+
+    // Help function
+    window.help = function() {
+        console.log('%c🎨 Advanced Canvas Toolkit v3.0 - Help Guide', 'color: #00ff00; font-size: 16px; font-weight: bold;');
+        console.log('%c═══════════════════════════════════════════════════════════════════', 'color: #00ff00;');
+        console.log('%cAvailable Commands:', 'color: #00ff00;');
+
+        const commands = {
+            'help()': 'Show this help message',
+            'startQuiz()': 'Start the quiz automation process',
+            'debugger.pause()': 'Pause execution and enter debug mode',
+            'debugger.resume()': 'Resume execution from debug mode',
+            'debugger.stepOver()': 'Step over current line in debug mode',
+            'debugger.stepInto()': 'Step into function call in debug mode',
+            'debugger.stepOut()': 'Step out of current function in debug mode',
+            'debugger.addWatch("expression")': 'Add a watch expression',
+            'debugger.setBreakpoint("location")': 'Set a breakpoint',
+            'canvas.applyFilter("filterType", options)': 'Apply a filter to the canvas',
+            'performance.getMetrics()': 'Get performance metrics',
+            'logger.exportLogs()': 'Export educational logs'
+        };
+
+        for (const [command, description] of Object.entries(commands)) {
+            console.log(`%c${command}`, 'color: #00ff00; font-weight: bold;');
+            console.log(`%c    ${description}`, 'color: #888888');
+            console.log('');
+        }
+
+        console.log('%cExamples:', 'color: #00ff00;');
+        console.log([
+            '// Apply a glitch effect to canvas',
+            'canvas.applyFilter("glitch", { intensity: 0.5 });',
+            '',
+            '// Set a conditional breakpoint',
+            'debugger.setBreakpoint("processQuestion", "score > 90");',
+            '',
+            '// Watch a variable',
+            'debugger.addWatch("currentQuestion.score");'
+        ].join('\n'));
+        console.log('%c═══════════════════════════════════════════════════════════════════', 'color: #00ff00;');
+    };
 
     // Create global instance with enhanced security and visual effects
     const toolkit = new CanvasToolkit();
@@ -1020,6 +1853,40 @@ $$$$P d$$$$F $ $$$$$$$$$- $$$$$$
         }
     };
 
+    (function initializeToolkit() {
+        console.clear();
+        
+        const skull = [
+            "                     .ed\"\"\" \"\"\"$$$$be.",
+            "                   -\"           ^\"\"**$$$e.",
+            "                 .\"                   '$$$c",
+            "                /                      \"4$$b",
+            "               d  3                      $$$$",
+            "               $  *                   .$$$$$$",
+            "              .$  ^c           $$$$$e$$$$$$$.",
+            "              d$L  4.         4$$$$$$$$$$$$$$b",
+            "              $$$$b ^ceeeee.  4$$ECL.F*$$$$$$$",
+            "              $$$$P d$$$$F $ $$$$$$$$$- $$$$$$",
+            "              3$$$F \"$$$$b   $\"$$$$$$$  $$$$*\"",
+            "               $$P\"  \"$$b   .$ $$$$$...e$$",
+            "                *c    ..    $$ 3$$$$$$$$$$eF",
+            "                  %ce\"\"    $$$  $$$$$$$$$$*",
+            "                   *$e.    *** d$$$$$\"L$$",
+            "                    $$$      4J$$$$$% $$$",
+            "                   $\"'$=e....$*$$**$cz$$\"",
+            "                   $  *=%4.$ L L$ P3$$$F",
+            "                   $   \"%*ebJLzb$e$$$$$b",
+            "                    %..      4$$$$$$$$$$",
+            "                     $$$e   z$$$$$$$$$$",
+            "                      \"*$c  \"$$$$$$$P\"",
+            "                        \"\"\"*$$$$$$$\""
+        ].join('\n');
+
+        console.log('%c' + skull, 'color: #ff0000; font-family: monospace; font-size: 14px;');
+        console.log('%c╔══════════════════════════════════════════════════════════════╗\n║                Advanced Canvas Toolkit v3.0                   ║\n║           Created by Tadashi Jei (TadashiJei.com)           ║\n╚══════════════════════════════════════════════════════════════╝', 'color: #00ff00; font-family: monospace; font-size: 12px;');
+        console.log('%c\n[*] Initializing security measures...\n[*] Loading canvas manipulators...\n[*] Setting up debugger...\n[*] Establishing secure environment...\n[+] Toolkit ready for operation!\n\nType help() for usage instructions.', 'color: #00ff00; font-family: monospace; font-size: 12px;');
+    })();
+    
     console.log(`%c
     ████████╗ █████╗ ██████╗  █████╗ ███████╗██╗  ██╗██╗     ██╗███████╗██╗
     ╚══██╔══╝██╔══██╗██╔══██╗██╔══██╗██╔════╝██║  ██║██║     ██║██╔════╝██║
@@ -1030,18 +1897,20 @@ $$$$P d$$$$F $ $$$$$$$$$- $$$$$$
     `, 'color: #00ff00; font-family: monospace;');
 
     console.log(`%c
-    ▄▄▄█████▓ ▒█████   ▒█████   ██▓     ██ ▄█▀ ██▓▄▄▄█████▓
-    ▓  ██▒ ▓▒▒██▒  ██▒▒██▒  ██▒▓██▒     ██▄█▒ ▓██▒▓  ██▒ ▓▒
-    ▒ ▓██░ ▒░▒██░  ██▒▒██░  ██▒▒██░    ▓███▄░ ▒██▒▒ ▓██░ ▒░
-    ░ ▓██▓ ░ ▒██   ██░▒██   ██░▒██░    ▓██ █▄ ░██░░ ▓██▓ ░ 
-      ▒██▒ ░ ░ ████▓▒░░ ████▓▒░░██████▒▒██▒ █▄░██░  ▒██▒ ░ 
-      ▒ ░░   ░ ▒░▒░▒░ ░ ▒░▒░▒░ ░ ▒░▓  ░▒ ▒▒ ▓▒░▓    ▒ ░░   
-        ░      ░ ▒ ▒░   ░ ▒ ▒░ ░ ░ ▒  ░░ ░▒ ▒░ ▒ ░    ░    
-      ░      ░ ░ ░ ▒  ░ ░ ░ ▒    ░ ░   ░ ░░ ░  ▒ ░  ░      
-                ░ ░      ░ ░      ░  ░░  ░    ░         
-    `, 'color: #00ff00; font-family: monospace;');
-    
-    console.log('%cEnhanced Canvas Toolkit v2.0', 'color: #00ff00; font-weight: bold; font-size: 20px;');
+    ▄█▀▀▀▀▀█▄
+  ▄█▀  ▄▄   ▀█▄
+  █   ███▄▄   █
+  █  █████▀   █
+  █   ███▀▄   █
+  ▀█▄  ▀▀  ▄█▀
+    ▀█▄▄▄▄█▀
+  ▄█  ▄▄▄▄  █▄
+  █  ▄████▄  █
+  █  █▀▀▀▀█  █
+  █▄█      █▄█
+`, 'color: #00ff00; font-family: monospace;');
+
+    console.log('%cEnhanced Canvas Toolkit v3.0', 'color: #00ff00; font-weight: bold; font-size: 20px;');
     console.log('%cCreated by Tadashi Jei (TadashiJei.com)', 'color: #00ff00; font-size: 16px;');
     console.log('%c───────────────────────────────────────────', 'color: #00ff00;');
     console.log('%cInjection Guide:', 'color: #00ff00; font-weight: bold;');
