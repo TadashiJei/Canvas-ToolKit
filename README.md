@@ -1,188 +1,250 @@
-# Advanced Canvas Toolkit v3.0 🎨
+# Advanced Canvas Toolkit v6.0 🎨
 
 A powerful JavaScript toolkit for canvas manipulation, analysis, and educational research. This toolkit provides advanced features for canvas manipulation, performance monitoring, pattern recognition, and debugging capabilities.
 
-## 🌟 Features
+## 🚀 Features
 
-### 1. Canvas Analysis
-- Pixel distribution analysis
-- Pattern detection (symmetry, gradients, repeating elements)
-- Feature extraction and analysis
-- Real-time performance metrics
+### 1. Advanced Mathematics Analysis
+- **Calculus**
+  - Multiple & Line Integrals
+  - Vector Calculus (∇, curl, div)
+  - Series & Sequences
+  - Limits & Continuity
+  - Complex Integration
 
-### 2. Canvas Manipulation
-- Advanced filters:
-  - Grayscale
-  - Blur (configurable radius)
-  - Sharpen
-  - Edge Detection (Sobel)
-  - Pixelate
-  - Glitch effect
-- Pattern recognition
-- Visual effects
+- **Linear Algebra**
+  - Matrix Operations
+  - Eigenvalues/Eigenvectors
+  - Vector Spaces
+  - Linear Transformations
+  - Systems of Equations
 
-### 3. Performance Monitoring
-- Real-time metrics tracking
-- Frame rate analysis
-- Operation timing
-- Performance insights
+- **Complex Analysis**
+  - Complex Functions
+  - Conformal Mappings
+  - Residue Theory
+  - Laurent Series
+  - Contour Integration
 
-### 4. Advanced Animation System
-- Multiple easing functions
-- Frame-based animations
-- Performance-optimized rendering
-- Animation control (pause/resume/stop)
+- **Differential Equations**
+  - Ordinary DEs
+  - Partial DEs
+  - Boundary Value Problems
+  - Initial Value Problems
+  - Systems of DEs
 
-### 5. Advanced Debugger
-- Breakpoint management
-- Watch expressions
-- Call stack tracking
-- Step-by-step execution
-- Conditional breakpoints
+### 2. Image Analysis
+- OCR Text Extraction
+- Shape Recognition
+- Pattern Detection
+- Color Analysis
+- Mathematical Symbol Recognition
 
-### 6. Educational Logging
-- Detailed operation logging
-- Performance insights
-- Educational recommendations
-- Export functionality
+### 3. Visual Results Display
+- Real-time Solution Steps
+- LaTeX Rendering
+- Confidence Metrics
+- Color-coded Sections
+- Interactive UI
 
-## 📚 API Reference
+## 🎯 Quick Start
 
-### PerformanceMonitor
-```javascript
-PerformanceMonitor.start(label)      // Start timing an operation
-PerformanceMonitor.end(label)        // End timing and get duration
-PerformanceMonitor.getMetrics()      // Get all performance metrics
+1. **Basic Setup**
+```html
+<!-- Add to your HTML -->
+<script src="main.js"></script>
 ```
 
-### CanvasAnalyzer
+2. **Start Analysis**
 ```javascript
-CanvasAnalyzer.getPixelDistribution(canvas)  // Analyze pixel color distribution
-CanvasAnalyzer.detectPatterns(canvas)        // Detect visual patterns
+// Initialize and start quiz analysis
+startQuiz()
 ```
 
-### CanvasManipulator
-```javascript
-CanvasManipulator.applyFilter(canvas, filterType, options)
-```
-Available filters:
-- grayscale
-- blur: `{ radius: number }`
-- sharpen
-- edge: Edge detection
-- pixelate: `{ size: number }`
-- glitch: `{ intensity: number }`
+3. **View Results**
+- Results appear in an overlay panel on the right
+- Click sections to expand detailed steps
+- Use confidence meters to gauge accuracy
+- Export results if needed
 
-### AnimationEngine
+## 📚 Advanced Usage
+
+### Mathematical Analysis
+
+1. **Calculus Problems**
 ```javascript
-AnimationEngine.createAnimation({
-    duration: number,
-    easing: string,
-    frames: array,
-    onUpdate: function,
-    onComplete: function
+// Multiple Integrals
+∫∫ x²y dxdy from 0 to 1
+
+// Vector Calculus
+∇ × F = <P, Q, R>
+
+// Series
+∑(1/n²) from n=1 to ∞
+```
+
+2. **Linear Algebra**
+```javascript
+// Matrix Operations
+[1 2; 3 4] × [a b; c d]
+
+// Eigenvalues
+det(A - λI) = 0
+```
+
+3. **Complex Analysis**
+```javascript
+// Complex Integration
+∮ (1/z) dz
+
+// Laurent Series
+f(z) = 1/(z-a)
+```
+
+4. **Differential Equations**
+```javascript
+// ODE
+dy/dx + P(x)y = Q(x)
+
+// PDE
+∂u/∂t = α∂²u/∂x²
+```
+
+### Image Analysis
+
+1. **Text in Images**
+```javascript
+// Extracts and processes text
+// Handles mathematical notation
+// Recognizes equations
+```
+
+2. **Diagrams**
+```javascript
+// Geometric shapes
+// Graphs
+// Mathematical plots
+```
+
+## 🛠️ Customization
+
+### Styling
+```javascript
+// Customize overlay appearance
+ResultsDisplay.setTheme({
+    background: '#1e1e1e',
+    text: '#00ff00',
+    accent: '#4CAF50'
 })
-
-AnimationEngine.pauseAnimation(id)
-AnimationEngine.resumeAnimation(id)
-AnimationEngine.stopAnimation(id)
 ```
 
-Available easing functions:
-- linear
-- easeInQuad
-- easeOutQuad
-- easeInOutQuad
-- easeInCubic
-- easeOutCubic
-- easeInOutCubic
-- bounce
-
-### AdvancedDebugger
+### Analysis Options
 ```javascript
-AdvancedDebugger.setBreakpoint(location, condition)
-AdvancedDebugger.addWatch(expression, callback)
-AdvancedDebugger.pause()
-AdvancedDebugger.resume()
-AdvancedDebugger.stepOver()
-AdvancedDebugger.stepInto()
-AdvancedDebugger.stepOut()
-AdvancedDebugger.evaluateExpression(expression)
+// Set confidence threshold
+QuizAnalyzer.setConfidenceThreshold(0.8)
+
+// Enable specific analysis types
+QuizAnalyzer.enableFeatures(['calculus', 'linear_algebra'])
 ```
 
-### EducationalLogger
-```javascript
-EducationalLogger.log(action, details, category)
-EducationalLogger.exportLogs()
-```
+## 🎨 Visual Features
 
-## 🚀 Usage Examples
+1. **Solution Steps**
+- Step-by-step breakdowns
+- Visual progress tracking
+- Intermediate results
+- Error checking
 
-### Basic Canvas Manipulation
-```javascript
-// Apply a filter to a canvas
-const canvas = document.querySelector('canvas');
-CanvasManipulator.applyFilter(canvas, 'glitch', { intensity: 0.5 });
+2. **Confidence Metrics**
+- Percentage confidence
+- Visual confidence bars
+- Reliability indicators
+- Alternative solutions
 
-// Create an animation
-const animationId = AnimationEngine.createAnimation({
-    duration: 1000,
-    easing: 'easeInOutCubic',
-    onUpdate: (progress) => {
-        // Animation frame update
-    },
-    onComplete: () => {
-        console.log('Animation completed');
-    }
-});
-```
-
-### Using the Debugger
-```javascript
-// Set a breakpoint
-AdvancedDebugger.setBreakpoint('functionName', 'count > 5');
-
-// Add a watch expression
-AdvancedDebugger.addWatch('object.property', (newValue, history) => {
-    console.log(`Value changed to: ${newValue}`);
-});
-
-// Start debugging
-AdvancedDebugger.pause();
-```
-
-### Performance Monitoring
-```javascript
-// Monitor an operation
-PerformanceMonitor.start('operation');
-// ... perform operation
-const duration = PerformanceMonitor.end('operation');
-console.log(`Operation took ${duration}ms`);
-```
+3. **Interactive Elements**
+- Expandable sections
+- Zoomable equations
+- Copyable results
+- Export options
 
 ## 🔒 Security Features
 
-- Advanced encryption (AES-GCM)
 - Memory protection
-- Network security
-- Anti-debugging measures
-- VM detection
+- Anti-detection measures
+- Safe execution
+- Error handling
 
-## 📝 Notes
+## 📝 Examples
 
-- This toolkit is designed for educational and research purposes
-- Performance may vary based on browser and hardware capabilities
-- Some features require modern browser APIs
-- Security features should be used responsibly
+### Basic Quiz Analysis
+```javascript
+// Start analysis
+startQuiz()
 
-## 🤝 Contributing
+// Results show:
+// 1. Extracted question
+// 2. Mathematical analysis
+// 3. Step-by-step solution
+// 4. Final answer with confidence
+```
 
-Contributions are welcome! Please feel free to submit pull requests.
+### Advanced Mathematics
+```javascript
+// Complex calculus problem
+∫∫∫ xyz dV over unit sphere
 
-## 📄 License
+// Results include:
+// 1. Conversion to spherical coordinates
+// 2. Integration steps
+// 3. Numerical result
+// 4. Visual representation
+```
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+## 🚨 Troubleshooting
 
-## 🙏 Acknowledgments
+1. **Common Issues**
+- Image recognition errors
+- Mathematical notation parsing
+- Browser compatibility
 
-Created by Tadashi Jei (TadashiJei.com)
+2. **Solutions**
+- Clear browser cache
+- Update dependencies
+- Check input format
+
+## 📱 Compatibility
+
+- Modern browsers (Chrome, Firefox, Safari)
+- Mobile responsive
+- Touch-friendly interface
+
+## 🔄 Updates
+
+Check for updates at: TadashiJei.com
+
+## 📫 Support
+
+For issues and feature requests:
+- Create an issue
+- Contact support
+- Check documentation
+
+## 🎓 Educational Use
+
+This toolkit is designed for educational purposes:
+- Study aid
+- Problem solving
+- Mathematical visualization
+- Learning tool
+
+## ⚖️ Responsible Use
+
+Please use this toolkit responsibly:
+- Educational purposes only
+- Respect academic integrity
+- Follow institutional guidelines
+- Credit sources appropriately
+
+---
+
+Made with 💚 by TadashiJei
