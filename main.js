@@ -1,3 +1,575 @@
+// Canvas Toolkit Class
+class CanvasToolkit {
+    constructor(config = {}) {
+        this.initialized = false;
+        this.encryptionKey = null;
+        this.apiKey = null;
+        this.GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+        this.securityToken = CryptoUtils.generateToken();
+        this.isEnabled = false;
+        this.originalCanvas = this._backupCanvasMethods();
+        
+        this.initSecurity();
+        this.setupAdvancedProtections();
+        this.initVisualEffects();
+        this.encryptApiKey();
+    }
+
+    async automateQuiz() {
+        try {
+            if (!this.initialized) {
+                await this.initialize();
+            }
+            return await QuizAutomation.automateQuiz();
+        } catch (error) {
+            console.error('Quiz automation failed:', error);
+            throw error;
+        }
+    }
+
+    async initialize() {
+        if (this.initialized) return true;
+        try {
+            console.log('Initializing toolkit components...');
+            await Promise.all([
+                SecuritySystem.init(),
+                MathAnalyzer.init(),
+                SolutionEngine.init(),
+                QuizAnalyzer.init(),
+                CollegeMathAnalyzer.init(),
+                AutoSolver.init()
+            ]);
+            console.log('All components initialized successfully');
+            this.initialized = true;
+            return true;
+        } catch (error) {
+            console.error('Failed to initialize toolkit:', error);
+            throw error;
+        }
+    }
+
+    _backupCanvasMethods() {
+        const canvas = document.createElement('canvas');
+        return {
+            getContext: canvas.getContext.bind(canvas),
+            toDataURL: canvas.toDataURL.bind(canvas),
+            toBlob: canvas.toBlob.bind(canvas),
+            addEventListener: canvas.addEventListener.bind(canvas),
+            removeEventListener: canvas.removeEventListener.bind(canvas),
+            dispatchEvent: canvas.dispatchEvent.bind(canvas)
+        };
+    }
+
+    initSecurity() {
+        this.securityEnabled = true;
+        this.protectionLevel = 'maximum';
+        this.memoryProtection = new Map();
+    }
+
+    setupAdvancedProtections() {
+        this.memory = new Map();
+        this.behaviorMonitor = {
+            mouseEvents: [],
+            keyboardEvents: [],
+            timeChecks: []
+        };
+    }
+
+    initVisualEffects() {
+        this.effects = {
+            glitch: () => console.log('Glitch effect'),
+            matrix: () => console.log('Matrix effect'),
+            rat: () => console.log('Rat animation')
+        };
+    }
+
+    async encryptApiKey() {
+        if (this.apiKey) {
+            const key = await CryptoUtils.generateKey();
+            this.apiKey = await CryptoUtils.encrypt(this.apiKey, key);
+        }
+    }
+}
+
+// Global namespace for all components
+window.CanvaToolkit = window.CanvaToolkit || {};
+
+// Security System
+window.CanvaToolkit.SecuritySystem = {
+    isInitialized: false,
+    
+    init() {
+        if (this.isInitialized) return;
+        
+        this.setupAntiDebug();
+        this.hideStack();
+        this.obfuscateMemory();
+        
+        this.isInitialized = true;
+        console.log('%c[Security] Security system initialized', 'color: #00ff00');
+    },
+    
+    setupAntiDebug() {
+        const antiDebug = () => {
+            const start = performance.now();
+            debugger;
+            const end = performance.now();
+            if (end - start > 100) {
+                console.clear();
+                window.location.reload();
+            }
+        };
+        setInterval(antiDebug, 1000);
+    },
+    
+    hideStack() {
+        Error.stackTraceLimit = 0;
+        Error.prepareStackTrace = () => '';
+    },
+    
+    obfuscateMemory() {
+        const functions = Object.keys(window).filter(key => typeof window[key] === 'function');
+        functions.forEach(fn => {
+            try {
+                Object.defineProperty(window[fn], 'name', { value: Math.random().toString(36) });
+            } catch (e) {}
+        });
+    }
+};
+
+// Math Analysis System
+window.CanvaToolkit.MathAnalyzer = {
+    isInitialized: false,
+    
+    init() {
+        if (this.isInitialized) return Promise.resolve();
+        
+        try {
+            this.setupMathEngine();
+            this.isInitialized = true;
+            console.log('%c[Math] Math analyzer initialized', 'color: #00ff00');
+            return Promise.resolve();
+        } catch (error) {
+            console.error('[Math] Failed to initialize:', error);
+            return Promise.reject(error);
+        }
+    },
+    
+    setupMathEngine() {
+        // Math engine setup code...
+        this.add = (a, b) => a + b;
+        this.subtract = (a, b) => a - b;
+        this.multiply = (a, b) => a * b;
+        this.divide = (a, b) => b !== 0 ? a / b : null;
+        
+        this.power = (base, exp) => Math.pow(base, exp);
+        this.sqrt = (x) => Math.sqrt(x);
+        this.log = (x) => Math.log(x);
+        
+        this.sin = (x) => Math.sin(x);
+        this.cos = (x) => Math.cos(x);
+        this.tan = (x) => Math.tan(x);
+    }
+};
+
+// Quiz Analysis System
+window.CanvaToolkit.QuizAnalyzer = {
+    isInitialized: false,
+    currentQuestion: null,
+    mathParser: null,
+
+    init() {
+        if (this.isInitialized) return Promise.resolve();
+        try {
+            this.setupEventListeners();
+            this.setupMathParser();
+            this.isInitialized = true;
+            console.log('%c[Quiz] Quiz analyzer initialized', 'color: #00ff00');
+            return Promise.resolve();
+        } catch (error) {
+            console.error('[Quiz] Failed to initialize:', error);
+            return Promise.reject(error);
+        }
+    },
+
+    setupEventListeners() {
+        document.addEventListener('mouseup', () => this.handleSelection());
+        document.addEventListener('keydown', (e) => this.handleKeyPress(e));
+    },
+
+    setupMathParser() {
+        this.mathParser = {
+            parseEquation(eq) {
+                const parts = eq.replace(/\s+/g, '').split('=');
+                if (parts.length !== 2) return null;
+
+                const leftSide = parts[0];
+                const rightSide = parts[1];
+
+                const coefficients = {
+                    x: 0,
+                    y: 0,
+                    constant: parseInt(rightSide)
+                };
+
+                const termRegex = /([+-]?\d*)([xy])/g;
+                let match;
+
+                while ((match = termRegex.exec(leftSide)) !== null) {
+                    const coeff = match[1] === '' ? 1 : 
+                                 match[1] === '+' ? 1 : 
+                                 match[1] === '-' ? -1 : 
+                                 parseInt(match[1]);
+                    const variable = match[2];
+                    coefficients[variable] = coeff;
+                }
+
+                return coefficients;
+            },
+
+            solveSystem(eq1, eq2) {
+                const c1 = this.parseEquation(eq1);
+                const c2 = this.parseEquation(eq2);
+                
+                if (!c1 || !c2) return null;
+
+                const det = c1.x * c2.y - c2.x * c1.y;
+                if (det === 0) return null;
+
+                const x = (c1.constant * c2.y - c2.constant * c1.y) / det;
+                const y = (c1.x * c2.constant - c2.x * c1.constant) / det;
+
+                return { x, y };
+            }
+        };
+    },
+
+    handleSelection() {
+        const selection = window.getSelection();
+        const text = selection.toString().trim();
+        if (!text) return;
+
+        const equations = this.extractEquations(text);
+        if (equations.length > 0) {
+            this.analyzeEquations(equations);
+        }
+    },
+
+    handleKeyPress(e) {
+        if (e.ctrlKey && e.key === 'q') {
+            this.quickSolve();
+        }
+    },
+
+    extractEquations(text) {
+        const equations = [];
+        const eqRegex = /(\d+x[-+]\d+y=\d+)/g;
+        let match;
+        
+        while ((match = eqRegex.exec(text)) !== null) {
+            equations.push(match[1]);
+        }
+        
+        return equations;
+    },
+
+    analyzeEquations(equations) {
+        if (equations.length < 2) return;
+
+        const solution = this.mathParser.solveSystem(equations[0], equations[1]);
+        if (solution) {
+            this.showSolution(solution);
+        }
+    },
+
+    showSolution(solution) {
+        const tooltip = document.createElement('div');
+        tooltip.className = 'quiz-tooltip';
+        tooltip.style.cssText = `
+            position: fixed;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            z-index: 10000;
+            max-width: 300px;
+        `;
+        
+        tooltip.innerHTML = `
+            Solution:<br>
+            x = ${solution.x}<br>
+            y = ${solution.y}
+        `;
+
+        document.body.appendChild(tooltip);
+        
+        const selection = window.getSelection();
+        const range = selection.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+        
+        tooltip.style.left = `${rect.left}px`;
+        tooltip.style.top = `${rect.bottom + 10}px`;
+
+        setTimeout(() => tooltip.remove(), 5000);
+    },
+
+    quickSolve() {
+        const questionText = document.querySelector('.question_text')?.textContent;
+        if (!questionText) return;
+
+        const equations = this.extractEquations(questionText);
+        if (equations.length > 0) {
+            this.analyzeEquations(equations);
+        }
+    }
+};
+
+// Initialize components
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const { SecuritySystem, MathAnalyzer, QuizAnalyzer } = window.CanvaToolkit;
+        
+        await SecuritySystem.init();
+        await MathAnalyzer.init();
+        await QuizAnalyzer.init();
+        
+        console.log('%c[System] All components initialized successfully', 'color: #00ff00');
+    } catch (error) {
+        console.error('[System] Failed to initialize components:', error);
+    }
+});
+
+// Backwards compatibility aliases
+window.SecuritySystem = window.CanvaToolkit.SecuritySystem;
+window.MathAnalyzer = window.CanvaToolkit.MathAnalyzer;
+window.QuizAnalyzer = window.CanvaToolkit.QuizAnalyzer;
+
+// Initialize global objects first
+(() => {
+    // Define CryptoUtils first since it's used in CanvasToolkit constructor
+    const CryptoUtils = {
+        generateToken() {
+            return Math.random().toString(36).substring(2);
+        },
+        async generateKey() {
+            return Math.random().toString(36).substring(2);
+        },
+        async encrypt(data, key) {
+            return data; // Mock implementation
+        }
+    };
+    window.CryptoUtils = CryptoUtils;
+
+    // Define SolutionEngine
+    const SolutionEngine = {
+        isInitialized: false,
+        async init() {
+            if (this.isInitialized) return;
+            
+            try {
+                await this.setupEngine();
+                this.isInitialized = true;
+                console.log('%c[Solution] Solution engine initialized', 'color: #00ff00');
+                return Promise.resolve();
+            } catch (error) {
+                console.error('[Solution] Failed to initialize:', error);
+                return Promise.reject(error);
+            }
+        },
+        
+        async setupEngine() {
+            // Solution engine setup code...
+        }
+    };
+    window.SolutionEngine = SolutionEngine;
+
+    // Initialize components in correct order
+    const initializeComponents = async () => {
+        try {
+            await SecuritySystem.init();
+            await MathAnalyzer.init();
+            await QuizAnalyzer.init();
+            console.log('%c[System] All components initialized successfully', 'color: #00ff00');
+        } catch (error) {
+            console.error('[System] Failed to initialize components:', error);
+        }
+    };
+
+    // Start initialization when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeComponents);
+    } else {
+        initializeComponents();
+    }
+})();
+
+// Make sure components are properly scoped
+if (typeof window.SecuritySystem === 'undefined') {
+    console.error('[System] SecuritySystem not found. Check initialization order.');
+}
+if (typeof window.MathAnalyzer === 'undefined') {
+    console.error('[System] MathAnalyzer not found. Check initialization order.');
+}
+if (typeof window.QuizAnalyzer === 'undefined') {
+    console.error('[System] QuizAnalyzer not found. Check initialization order.');
+}
+
+// Create global instance
+window.toolkit = new CanvasToolkit();
+
+// Global startQuiz function
+window.startQuiz = async function() {
+    try {
+        console.log('%cInitializing Toolkit...', 'color: #00ff00');
+        await toolkit.initialize();
+        
+        console.log('%cStarting quiz automation...', 'color: #00ff00');
+        await toolkit.automateQuiz();
+        
+        console.log('%cQuiz automation complete!', 'color: #00ff00');
+    } catch (error) {
+        console.error('Quiz automation failed:', error);
+    }
+};
+
+// Initialize toolkit with display system
+window.initializeToolkit = async (config = {}) => {
+    try {
+        // Initialize toolkit
+        await toolkit.initialize();
+        
+        // Initialize core systems first
+        await SecuritySystem.init();
+        await ResultsDisplay.init();
+        
+        // Initialize analyzers after core systems
+        await MathAnalyzer.init();
+        await SolutionEngine.init();
+        await QuizAnalyzer.init();
+        
+        console.log('Toolkit initialized successfully');
+        return true;
+    } catch (error) {
+        console.error('Failed to initialize toolkit:', error);
+        throw error;
+    }
+};
+
+// Export toolkit for module usage
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        CanvasToolkit,
+        toolkit,
+        startQuiz
+    };
+}
+
+// Global namespace objects
+window.MathAnalyzer = {};
+window.SolutionEngine = {};
+window.QuizAnalyzer = {};
+window.CollegeMathAnalyzer = {};
+window.AutoSolver = {};
+window.SecuritySystem = {};
+window.ResultsDisplay = {};
+
+// Load external dependencies
+(function loadDependencies() {
+    // Load math.js for mathematical operations
+    const mathScript = document.createElement('script');
+    mathScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.4.4/math.min.js';
+    mathScript.async = true;
+    document.head.appendChild(mathScript);
+
+    // Load MathJax for math rendering
+    const mathjaxScript = document.createElement('script');
+    mathjaxScript.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+    mathjaxScript.async = true;
+    document.head.appendChild(mathjaxScript);
+})();
+
+// Global Results Display System
+window.ResultsDisplay = {
+    init() {
+        if (!document.getElementById('canvas-toolkit-display')) {
+            this.createStyles();
+            this.createContainer();
+        }
+        return this;
+    },
+
+    createStyles() {
+        const style = document.createElement('style');
+        style.textContent = `
+            #canvas-toolkit-display {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: rgba(0, 0, 0, 0.85);
+                color: #00ff00;
+                font-family: monospace;
+                padding: 15px;
+                border-radius: 8px;
+                z-index: 9999;
+                max-width: 400px;
+                display: none;
+                transition: opacity 0.3s ease;
+            }
+            #canvas-toolkit-display.active {
+                display: block;
+                animation: fadeIn 0.3s;
+            }
+            .result-item {
+                margin: 5px 0;
+                border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    },
+
+    createContainer() {
+        const container = document.createElement('div');
+        container.id = 'canvas-toolkit-display';
+        document.body.appendChild(container);
+    },
+
+    show(message) {
+        const container = document.getElementById('canvas-toolkit-display');
+        if (!container) return;
+        
+        if (typeof message === 'object') {
+            container.innerHTML = Object.entries(message)
+                .map(([key, value]) => `<div class="result-item"><strong>${key}:</strong> ${value}</div>`)
+                .join('');
+        } else {
+            container.innerHTML = `<div class="result-item">${message}</div>`;
+        }
+        
+        container.classList.add('active');
+        setTimeout(() => this.hide(), 5000);
+    },
+
+    hide() {
+        const container = document.getElementById('canvas-toolkit-display');
+        if (container) {
+            container.classList.remove('active');
+        }
+    },
+
+    success(message) {
+        this.show({ Status: 'Success', Message: message });
+    },
+
+    error(message) {
+        this.show({ Status: 'Error', Message: message });
+    }
+};
+
 /**
  * Advanced Canvas Toolkit v3.0
  * Created by Tadashi Jei (TadashiJei.com)
@@ -288,54 +860,342 @@
     };
 
     // Enhance QuizAnalyzer with image analysis
-    Object.assign(QuizAnalyzer, {
-        async processImageData(imageData) {
-            console.log('%c[Quiz] Processing image...', 'color: #00ff00');
+    const QuizAnalyzer = {
+        isInitialized: false,
+        patterns: null,
+        solutionEngine: null,
+
+        async init() {
+            await Promise.all([
+                MathAnalyzer.init(),
+                ResultsDisplay.init()
+            ]);
             
-            // Enhance image quality
-            const enhancedData = this.enhanceImage(imageData);
+            this.patterns = new Map([
+                ['calculus', /∫|∂|∇|lim|∑/g],
+                ['algebra', /[a-z]=|[xy]=|\+|-|\*|\/|\^/gi],
+                ['geometry', /triangle|circle|square|angle/gi],
+                ['trigonometry', /sin|cos|tan|csc|sec|cot/gi],
+                ['multiple-choice', /^[A-D]\.\s.+/gm],
+                ['true-false', /^(True|False)\.\s.+/gm],
+                ['numeric', /^\d+\.?\d*/gm]
+            ]);
             
-            // Extract text using OCR
-            const text = await ImageAnalyzer.analyzeImage(enhancedData);
-            console.log('%c[Quiz] Extracted text:', 'color: #00ff00', text);
-            
-            // Extract image features
-            const features = ImageAnalyzer.extractFeatures(enhancedData);
-            console.log('%c[Quiz] Image features:', 'color: #00ff00', features);
-            
-            // Combine text and visual analysis
-            const result = await this.combineAnalysis(text, features);
-            console.log('%c[Quiz] Analysis result:', 'color: #00ff00', result);
-            
-            return result;
+            console.log('%c[Quiz] Quiz analyzer initialized', 'color: #00ff00');
+            this.isActive = true;
         },
 
-        async combineAnalysis(text, features) {
-            // Combine text-based and visual analysis
-            const textScore = this.analyzeText(text);
-            const visualScore = this.analyzeVisualFeatures(features);
-            
-            // Weight the scores (70% text, 30% visual)
-            const combinedScore = textScore * 0.7 + visualScore * 0.3;
-            
-            return {
-                text,
-                features,
-                score: combinedScore,
-                confidence: Math.min(combinedScore / 100, 0.99)
-            };
+        async processImageData(imageData) {
+            if (!this.isActive) await this.init();
+            console.log('%c[Quiz] Processing image data...', 'color: #00ff00');
+
+            const enhancedData = this.enhanceImage(imageData);
+            const text = await this.performOCR(enhancedData);
+            return this.analyzeText(text);
+        },
+
+        enhanceImage(imageData) {
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                // Convert to grayscale
+                const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                data[i] = data[i + 1] = data[i + 2] = avg;
+                
+                // Increase contrast
+                const factor = 1.2;
+                data[i] *= factor;
+                data[i + 1] *= factor;
+                data[i + 2] *= factor;
+            }
+            return imageData;
+        },
+
+        async performOCR(imageData) {
+            // OCR implementation
+            return "Sample text from image";
         },
 
         analyzeText(text) {
-            // Implement text analysis scoring
-            return text ? 80 : 0;
+            for (const [type, pattern] of this.patterns) {
+                const matches = text.match(pattern);
+                if (matches) {
+                    return this.processMatches(type, matches);
+                }
+            }
+            return null;
         },
 
-        analyzeVisualFeatures(features) {
-            // Implement visual feature scoring
-            return features.edges ? 70 : 0;
+        processMatches(type, matches) {
+            switch (type) {
+                case 'multiple-choice':
+                    return this.analyzeMultipleChoice(matches);
+                case 'true-false':
+                    return this.analyzeTrueFalse(matches);
+                case 'numeric':
+                    return this.analyzeNumeric(matches);
+                case 'calculus':
+                    return this.solveCalculus(matches[0]);
+                case 'algebra':
+                    return this.solveAlgebra(matches[0]);
+                default:
+                    return null;
+            }
+        },
+
+        analyzeMultipleChoice(matches) {
+            return {
+                type: 'multiple-choice',
+                answer: matches[0],
+                confidence: 0.95
+            };
+        },
+
+        analyzeTrueFalse(matches) {
+            return {
+                type: 'true-false',
+                answer: matches[0],
+                confidence: 0.90
+            };
+        },
+
+        analyzeNumeric(matches) {
+            return {
+                type: 'numeric',
+                answer: matches[0],
+                confidence: 0.85
+            };
+        },
+
+        async solveCalculus(expr) {
+            return await SolutionEngine.solveEquation(expr);
+        },
+
+        async solveAlgebra(expr) {
+            return await SolutionEngine.solveEquation(expr);
+        },
+
+        async solveGeometry(expr) {
+            return await SolutionEngine.solveEquation(expr);
+        },
+
+        async solveTrigonometry(expr) {
+            return await SolutionEngine.solveEquation(expr);
+        },
+
+        secureProcess(data) {
+            if (!SecuritySystem.isInitialized) {
+                SecuritySystem.init();
+            }
+            return SecuritySystem.process(data);
+        },
+
+        highlightAnswer(canvas, answer) {
+            const ctx = canvas.getContext('2d');
+            ctx.save();
+            
+            // Highlight style
+            ctx.strokeStyle = '#00ff00';
+            ctx.lineWidth = 2;
+            ctx.globalAlpha = 0.5;
+            
+            // Draw highlight
+            const x = 50;
+            const y = 50;
+            ctx.strokeRect(x - 5, y - 20, 200, 30);
+            
+            // Draw answer
+            ctx.fillStyle = '#00ff00';
+            ctx.font = '16px monospace';
+            ctx.fillText(`Answer: ${answer.answer} (${Math.round(answer.confidence * 100)}% confident)`, x, y);
+            
+            ctx.restore();
+        },
+
+        async startScan() {
+            if (!this.isActive) await this.init();
+            console.log('%c[Quiz] Starting scan...', 'color: #00ff00');
+
+            try {
+                const canvases = document.querySelectorAll('canvas');
+                if (canvases.length === 0) {
+                    throw new Error('No canvas elements found');
+                }
+
+                for (const canvas of canvases) {
+                    const ctx = canvas.getContext('2d');
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const result = await this.processImageData(imageData);
+                    
+                    if (result) {
+                        console.log('%c[Quiz] Found answer:', 'color: #00ff00', result);
+                        this.highlightAnswer(canvas, result);
+                    }
+                }
+            } catch (error) {
+                console.error('%c[Quiz] Error:', 'color: #ff0000', error.message);
+            }
         }
-    });
+    };
+
+    // Quiz Analysis System
+    window.QuizAnalyzer = {
+        isInitialized: false,
+        currentQuestion: null,
+        mathParser: null,
+
+        init() {
+            if (this.isInitialized) return Promise.resolve();
+            try {
+                this.setupEventListeners();
+                this.setupMathParser();
+                this.isInitialized = true;
+                console.log('%c[Quiz] Quiz analyzer initialized', 'color: #00ff00');
+                return Promise.resolve();
+            } catch (error) {
+                console.error('[Quiz] Failed to initialize:', error);
+                return Promise.reject(error);
+            }
+        },
+
+        setupEventListeners() {
+            document.addEventListener('mouseup', () => this.handleSelection());
+            document.addEventListener('keydown', (e) => this.handleKeyPress(e));
+        },
+
+        setupMathParser() {
+            this.mathParser = {
+                parseEquation(eq) {
+                    // Remove whitespace and split on =
+                    const parts = eq.replace(/\s+/g, '').split('=');
+                    if (parts.length !== 2) return null;
+
+                    const leftSide = parts[0];
+                    const rightSide = parts[1];
+
+                    // Parse coefficients
+                    const coefficients = {
+                        x: 0,
+                        y: 0,
+                        constant: parseInt(rightSide)
+                    };
+
+                    // Match terms like: 52x, +38y, -12x, etc.
+                    const termRegex = /([+-]?\d*)([xy])/g;
+                    let match;
+
+                    while ((match = termRegex.exec(leftSide)) !== null) {
+                        const coeff = match[1] === '' ? 1 : 
+                                     match[1] === '+' ? 1 : 
+                                     match[1] === '-' ? -1 : 
+                                     parseInt(match[1]);
+                        const variable = match[2];
+                        coefficients[variable] = coeff;
+                    }
+
+                    return coefficients;
+                },
+
+                solveSystem(eq1, eq2) {
+                    const c1 = this.parseEquation(eq1);
+                    const c2 = this.parseEquation(eq2);
+                    
+                    if (!c1 || !c2) return null;
+
+                    // Using Cramer's rule
+                    const det = c1.x * c2.y - c2.x * c1.y;
+                    if (det === 0) return null;
+
+                    const x = (c1.constant * c2.y - c2.constant * c1.y) / det;
+                    const y = (c1.x * c2.constant - c2.x * c1.constant) / det;
+
+                    return { x, y };
+                }
+            };
+        },
+
+        handleSelection() {
+            const selection = window.getSelection();
+            const text = selection.toString().trim();
+            if (!text) return;
+
+            const equations = this.extractEquations(text);
+            if (equations.length > 0) {
+                this.analyzeEquations(equations);
+            }
+        },
+
+        handleKeyPress(e) {
+            // Handle keyboard shortcuts
+            if (e.ctrlKey && e.key === 'q') {
+                this.quickSolve();
+            }
+        },
+
+        extractEquations(text) {
+            const equations = [];
+            const eqRegex = /(\d+x[-+]\d+y=\d+)/g;
+            let match;
+            
+            while ((match = eqRegex.exec(text)) !== null) {
+                equations.push(match[1]);
+            }
+            
+            return equations;
+        },
+
+        analyzeEquations(equations) {
+            if (equations.length < 2) return;
+
+            const solution = this.mathParser.solveSystem(equations[0], equations[1]);
+            if (solution) {
+                this.showSolution(solution);
+            }
+        },
+
+        showSolution(solution) {
+            const tooltip = document.createElement('div');
+            tooltip.className = 'quiz-tooltip';
+            tooltip.style.cssText = `
+                position: fixed;
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 10px;
+                border-radius: 5px;
+                font-size: 14px;
+                z-index: 10000;
+                max-width: 300px;
+            `;
+            
+            tooltip.innerHTML = `
+                Solution:<br>
+                x = ${solution.x}<br>
+                y = ${solution.y}
+            `;
+
+            document.body.appendChild(tooltip);
+            
+            // Position tooltip
+            const selection = window.getSelection();
+            const range = selection.getRangeAt(0);
+            const rect = range.getBoundingClientRect();
+            
+            tooltip.style.left = `${rect.left}px`;
+            tooltip.style.top = `${rect.bottom + 10}px`;
+
+            // Remove after delay
+            setTimeout(() => tooltip.remove(), 5000);
+        },
+
+        quickSolve() {
+            const questionText = document.querySelector('.question_text')?.textContent;
+            if (!questionText) return;
+
+            const equations = this.extractEquations(questionText);
+            if (equations.length > 0) {
+                this.analyzeEquations(equations);
+            }
+        }
+    };
 
     // Canvas Manipulation System
     const CanvasManipulator = {
@@ -367,9 +1227,7 @@
             const data = imageData.data;
             for (let i = 0; i < data.length; i += 4) {
                 const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-                data[i] = avg;
-                data[i + 1] = avg;
-                data[i + 2] = avg;
+                data[i] = data[i + 1] = data[i + 2] = avg;
             }
             return imageData;
         },
@@ -637,31 +1495,48 @@
         }
     };
 
-    // Encryption utilities
+    // Crypto Utilities for Browser Environment
     const CryptoUtils = {
-        async encrypt(text, key) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(text);
-            const hash = await crypto.subtle.digest('SHA-256', encoder.encode(key));
-            const cryptoKey = await crypto.subtle.importKey(
-                'raw', hash, { name: 'AES-GCM' }, false, ['encrypt']
+        async generateKey() {
+            return await window.crypto.subtle.generateKey(
+                {
+                    name: "AES-GCM",
+                    length: 256
+                },
+                true,
+                ["encrypt", "decrypt"]
             );
-            const iv = crypto.getRandomValues(new Uint8Array(12));
-            const encrypted = await crypto.subtle.encrypt(
-                { name: 'AES-GCM', iv }, cryptoKey, data
-            );
-            return { encrypted, iv };
         },
 
-        async decrypt(encrypted, key, iv) {
-            const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(key));
-            const cryptoKey = await crypto.subtle.importKey(
-                'raw', hash, { name: 'AES-GCM' }, false, ['decrypt']
-            );
-            const decrypted = await crypto.subtle.decrypt(
-                { name: 'AES-GCM', iv }, cryptoKey, encrypted
-            );
-            return new TextDecoder().decode(decrypted);
+        async encrypt(data, key) {
+            try {
+                const encoder = new TextEncoder();
+                const encodedData = encoder.encode(data);
+                const iv = window.crypto.getRandomValues(new Uint8Array(12));
+                
+                const encryptedData = await window.crypto.subtle.encrypt(
+                    {
+                        name: "AES-GCM",
+                        iv: iv
+                    },
+                    key,
+                    encodedData
+                );
+
+                const encryptedArray = new Uint8Array(encryptedData);
+                const resultArray = new Uint8Array(iv.length + encryptedArray.length);
+                resultArray.set(iv);
+                resultArray.set(encryptedArray, iv.length);
+
+                return btoa(String.fromCharCode.apply(null, resultArray));
+            } catch (error) {
+                console.error('Encryption failed:', error);
+                return data; // Return original data if encryption fails
+            }
+        },
+
+        generateToken() {
+            return btoa(String.fromCharCode.apply(null, window.crypto.getRandomValues(new Uint8Array(32))));
         }
     };
 
@@ -865,7 +1740,7 @@ $$$$P d$$$$F $ $$$$$$$$$- $$$$$$
           \\__|IIIIII|__/
            | \\IIIIII/ |
            \\          /
-            \`--------\`
+            ｀--------\`
 `,
 `
                  uuuuuuu
@@ -873,8 +1748,6 @@ $$$$P d$$$$F $ $$$$$$$$$- $$$$$$
           uu$$$$$$$$$$$$$$$$$uu
          u$$$$$$$$$$$$$$$$$$$$$u
         u$$$$$$$$$$$$$$$$$$$$$$$u
-       u$$$$$$$$$$$$$$$$$$$$$$$$$u
-       u$$$$$$$$$$$$$$$$$$$$$$$$$u
        u$$$$$$"   "$$$"   "$$$$$$u
        "$$$$"      u$u       $$$$"
         $$$u       u$u       u$$$
@@ -882,7 +1755,7 @@ $$$$P d$$$$F $ $$$$$$$$$- $$$$$$
          "$$$$uu$$$   $$$uu$$$$"
           "$$$$$$$"   "$$$$$$$"
             u$$$$$$$u$$$$$$$u
-             u$"$"$"$"$"$"$u
+             u$"$"$"$"$u
 `
         ],
 
@@ -1517,533 +2390,186 @@ $$$$P d$$$$F $ $$$$$$$$$- $$$$$$
     };
 
     // Quiz Analysis System
-    const QuizAnalyzer = {
-        isActive: false,
-        patterns: new Map(),
-        
-        // Initialize the quiz analyzer
-        init() {
-            this.patterns.set('multiple-choice', /^[A-D]\.\s.+/gm);
-            this.patterns.set('true-false', /^(True|False)\.\s.+/gm);
-            this.patterns.set('numeric', /^\d+\.?\d*/gm);
-            console.log('%c[Quiz] Analyzer initialized', 'color: #00ff00');
+    const SolutionEngine = {
+        async init() {
+            await Promise.all([
+                MathAnalyzer.init(),
+                ResultsDisplay.init()
+            ]);
+            
+            this.patterns = new Map([
+                ['calculus', /∫|∂|∇|lim|∑/g],
+                ['algebra', /[a-z]=|[xy]=|\+|-|\*|\/|\^/gi],
+                ['geometry', /triangle|circle|square|angle/gi],
+                ['trigonometry', /sin|cos|tan|csc|sec|cot/gi]
+            ]);
+            
+            console.log('%c[Engine] Solution engine initialized', 'color: #00ff00');
             this.isActive = true;
         },
 
-        // Start scanning the quiz
-        async startScan() {
-            if (!this.isActive) this.init();
-            console.log('%c[Quiz] Starting scan...', 'color: #00ff00');
-
-            try {
-                // Get all canvas elements
-                const canvases = document.querySelectorAll('canvas');
-                if (canvases.length === 0) {
-                    throw new Error('No canvas elements found');
-                }
-
-                // Process each canvas
-                for (const canvas of canvases) {
-                    const ctx = canvas.getContext('2d');
-                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    const text = await this.processImageData(imageData);
-                    
-                    if (text) {
-                        const answer = this.analyzeQuestion(text);
-                        if (answer) {
-                            console.log('%c[Quiz] Found answer:', 'color: #00ff00', answer);
-                            this.highlightAnswer(canvas, answer);
-                        }
-                    }
-                }
-            } catch (error) {
-                console.error('%c[Quiz] Error:', 'color: #ff0000', error.message);
-            }
-        },
-
-        // Process image data to extract text
-        async processImageData(imageData) {
-            // Advanced image processing
-            const enhancedData = this.enhanceImage(imageData);
-            // OCR processing would go here
-            return "Sample question text";
-        },
-
-        // Enhance image for better text recognition
-        enhanceImage(imageData) {
-            const data = imageData.data;
-            for (let i = 0; i < data.length; i += 4) {
-                // Convert to grayscale
-                const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-                data[i] = data[i + 1] = data[i + 2] = avg;
-                
-                // Increase contrast
-                const factor = 1.2;
-                data[i] *= factor;
-                data[i + 1] *= factor;
-                data[i + 2] *= factor;
-            }
-            return imageData;
-        },
-
-        // Analyze question and determine answer
-        analyzeQuestion(text) {
-            // Pattern matching for different question types
-            for (const [type, pattern] of this.patterns) {
-                const matches = text.match(pattern);
-                if (matches) {
-                    return this.processMatches(type, matches);
-                }
-            }
-            return null;
-        },
-
-        // Process matched patterns
-        processMatches(type, matches) {
-            switch (type) {
-                case 'multiple-choice':
-                    return this.analyzeMultipleChoice(matches);
-                case 'true-false':
-                    return this.analyzeTrueFalse(matches);
-                case 'numeric':
-                    return this.analyzeNumeric(matches);
+        async solveEquation(text) {
+            const steps = [];
+            const type = this.identifyMathType(text);
+            
+            switch(type) {
+                case 'calculus':
+                    return await CollegeMathAnalyzer.solveCalculus(text);
+                case 'algebra':
+                    return await this.solveAlgebra(text);
+                case 'geometry':
+                    return await this.solveGeometry(text);
+                case 'trigonometry':
+                    return await this.solveTrigonometry(text);
                 default:
-                    return null;
+                    return await this.evaluateExpression(text);
             }
         },
 
-        // Analyze multiple choice questions
-        analyzeMultipleChoice(matches) {
-            // Advanced pattern recognition
+        async solveAlgebra(text) {
+            const steps = [];
+            const result = await this.evaluateExpression(text);
+            
+            if (result) {
+                steps.push({
+                    type: 'algebra',
+                    operation: 'solve',
+                    input: text,
+                    output: result,
+                    explanation: await this.generateExplanation(text, result)
+                });
+            }
+            
             return {
-                type: 'multiple-choice',
-                answer: 'B',
-                confidence: 0.95
+                steps,
+                result: result,
+                type: 'algebra'
             };
         },
 
-        // Analyze true/false questions
-        analyzeTrueFalse(matches) {
+        async solveGeometry(text) {
+            const steps = [];
+            const result = await this.evaluateExpression(text);
+            
+            if (result) {
+                steps.push({
+                    type: 'geometry',
+                    operation: 'solve',
+                    input: text,
+                    output: result,
+                    explanation: await this.generateExplanation(text, result)
+                });
+            }
+            
             return {
-                type: 'true-false',
-                answer: 'True',
-                confidence: 0.90
+                steps,
+                result: result,
+                type: 'geometry'
             };
         },
 
-        // Analyze numeric questions
-        analyzeNumeric(matches) {
+        async solveTrigonometry(text) {
+            const steps = [];
+            const result = await this.evaluateExpression(text);
+            
+            if (result) {
+                steps.push({
+                    type: 'trigonometry',
+                    operation: 'solve',
+                    input: text,
+                    output: result,
+                    explanation: await this.generateExplanation(text, result)
+                });
+            }
+            
             return {
-                type: 'numeric',
-                answer: '42',
-                confidence: 0.85
+                steps,
+                result: result,
+                type: 'trigonometry'
             };
         },
 
-        // Highlight the answer on the canvas
-        highlightAnswer(canvas, answer) {
-            const ctx = canvas.getContext('2d');
-            ctx.save();
+        async evaluateExpression(text) {
+            try {
+                // Use math.js for evaluation
+                const result = math.evaluate(text);
+                return result;
+            } catch (e) {
+                return text; // Return original if can't evaluate
+            }
+        },
+
+        async generateExplanation(input, output) {
+            const steps = [];
             
-            // Highlight style
-            ctx.strokeStyle = '#00ff00';
-            ctx.lineWidth = 2;
-            ctx.globalAlpha = 0.5;
+            // Parse input
+            steps.push({
+                step: 'Parse input expression',
+                detail: `Analyzing: ${input}`
+            });
             
-            // Draw highlight
-            const x = 50;
-            const y = 50;
-            ctx.strokeRect(x - 5, y - 20, 200, 30);
+            // Identify operation type
+            const operationType = this.identifyMathType(input);
+            steps.push({
+                step: 'Identify operation',
+                detail: `Operation type: ${operationType}`
+            });
             
-            // Draw answer
-            ctx.fillStyle = '#00ff00';
-            ctx.font = '16px monospace';
-            ctx.fillText(`Answer: ${answer.answer} (${Math.round(answer.confidence * 100)}% confident)`, x, y);
+            // Show solution steps
+            steps.push({
+                step: 'Solve',
+                detail: `Result: ${output}`
+            });
             
-            ctx.restore();
+            return steps;
+        },
+
+        identifyMathType(input) {
+            for (const [type, pattern] of this.patterns) {
+                if (pattern.test(input)) {
+                    return type;
+                }
+            }
+            return 'basic';
         }
     };
 
     // Add quiz commands to global toolkit
     window.startQuiz = () => QuizAnalyzer.startScan();
 
-    class CanvasToolkit {
-        constructor(config = {}) {
-            this.initializeProtections();
-            this.setupEncryption();
-            this.apiKey = this.secureStore(config.apiKey || prompt('Enter your Gemini API key:'));
-            this.GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
-            this.securityToken = this.generateSecurityToken();
-            this.isEnabled = false;
-            this.originalCanvas = this._backupCanvasMethods();
-            this.initSecurity();
-            this.setupAdvancedProtections();
-            this.initVisualEffects();
-        }
-
-        // Initialize all protections
-        initializeProtections() {
-            VMDetector.evadeVM();
-            FingerprintProtection.init();
-            NetworkProtection.init();
-        }
-
-        // Setup encryption
-        async setupEncryption() {
-            this.encryptionKey = await crypto.subtle.generateKey(
-                { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']
-            );
-        }
-
-        // Secure storage
-        secureStore(value) {
-            return MemoryProtection.store('apiKey', value);
-        }
-
-        // Generate secure token
-        generateSecurityToken() {
-            const token = crypto.getRandomValues(new Uint8Array(32));
-            return btoa(String.fromCharCode.apply(null, token));
-        }
-
-        // Setup advanced protections
-        setupAdvancedProtections() {
-            this.setupMemoryProtection();
-            this.setupCodeProtection();
-            this.setupBehaviorAnalysis();
-        }
-
-        // Memory protection
-        setupMemoryProtection() {
-            Object.defineProperty(window, 'canvasToolkit', {
-                get: () => this.proxyHandler(this),
-                set: () => {
-                    throw new Error('Access denied');
-                }
-            });
-        }
-
-        // Code protection
-        setupCodeProtection() {
-            const code = this.toString();
-            Object.defineProperty(this, 'toString', {
-                value: () => '[object Object]',
-                writable: false,
-                configurable: false
-            });
-        }
-
-        // Behavior analysis
-        setupBehaviorAnalysis() {
-            let suspiciousActions = 0;
-            const maxSuspiciousActions = 3;
-
-            return new Proxy(this, {
-                get: (target, prop) => {
-                    if (typeof target[prop] === 'function') {
-                        return (...args) => {
-                            const start = performance.now();
-                            const result = target[prop].apply(target, args);
-                            
-                            if (result instanceof Promise) {
-                                return result.then(value => {
-                                    this._checkTiming(start);
-                                    return value;
-                                });
-                            }
-                            
-                            this._checkTiming(start);
-                            return result;
-                        };
-                    }
-                    return target[prop];
-                }
-            });
-        }
-
-        // Check for suspicious actions
-        isActionSuspicious() {
-            return (
-                this.checkTimeManipulation() ||
-                this.checkMouseMovement() ||
-                this.checkKeyboardEvents()
-            );
-        }
-
-        // Time manipulation check
-        checkTimeManipulation() {
-            const start = Date.now();
-            for (let i = 0; i < 1000; i++) {}
-            return (Date.now() - start) < 1;
-        }
-
-        // Mouse movement check
-        checkMouseMovement() {
-            const movements = [];
-            document.addEventListener('mousemove', (e) => {
-                movements.push([e.clientX, e.clientY]);
-                if (movements.length > 10) {
-                    const isRobot = this.analyzeMousePattern(movements);
-                    if (isRobot) return true;
-                }
-            });
-            return false;
-        }
-
-        // Analyze mouse patterns
-        analyzeMousePattern(movements) {
-            let perfectLines = 0;
-            for (let i = 2; i < movements.length; i++) {
-                const [x1, y1] = movements[i-2];
-                const [x2, y2] = movements[i-1];
-                const [x3, y3] = movements[i];
+    // Advanced Security System
+    if (!window.SecuritySystem) {
+        window.SecuritySystem = {
+            isInitialized: false,
+            
+            async init() {
+                if (this.isInitialized) return;
                 
-                const slope1 = (y2 - y1) / (x2 - x1);
-                const slope2 = (y3 - y2) / (x3 - x2);
+                await Promise.all([
+                    this.setupAntiDetection(),
+                    this.hideFromDebugger(),
+                    this.obfuscateMemory()
+                ]);
                 
-                if (Math.abs(slope1 - slope2) < 0.0001) {
-                    perfectLines++;
-                }
-            }
-            return perfectLines > 5;
-        }
-
-        // Keyboard event check
-        checkKeyboardEvents() {
-            const keyTimes = [];
-            document.addEventListener('keydown', (e) => {
-                keyTimes.push(Date.now());
-                if (keyTimes.length > 10) {
-                    const isRobot = this.analyzeKeyboardPattern(keyTimes);
-                    if (isRobot) return true;
-                }
-            });
-            return false;
-        }
-
-        // Analyze keyboard patterns
-        analyzeKeyboardPattern(times) {
-            const intervals = [];
-            for (let i = 1; i < times.length; i++) {
-                intervals.push(times[i] - times[i-1]);
-            }
+                this.isInitialized = true;
+                return true;
+            },
             
-            const avgInterval = intervals.reduce((a, b) => a + b) / intervals.length;
-            const perfectTiming = intervals.filter(i => Math.abs(i - avgInterval) < 10).length;
-            
-            return perfectTiming > intervals.length * 0.8;
-        }
-
-        // Handle suspicious activity
-        _handleSuspiciousActivity(reason) {
-            console.warn(`[Security Alert] ${reason}`);
-            this._addRandomDelay();
-        }
-
-        // Add random delay to simulate human behavior
-        _addRandomDelay() {
-            const delay = 1000 + Math.random() * 2000;
-            return new Promise(resolve => setTimeout(resolve, delay));
-        }
-
-        // Initialize visual effects
-        initVisualEffects() {
-            ASCIIAnimator.startSkullAnimation();
-            ratAnimation.init();
-            MatrixRain.init();
-            GlitchEffect.init();
-
-            // Apply glitch effect to quiz elements
-            document.querySelectorAll('.question, .answer').forEach(element => {
-                GlitchEffect.applyToElement(element);
-            });
-        }
-    };
-
-    // Advanced Debugger System
-    const AdvancedDebugger = {
-        breakpoints: new Map(),
-        watches: new Map(),
-        callStack: [],
-        isPaused: false,
-        stepMode: false,
-        
-        setBreakpoint(location, condition = null) {
-            this.breakpoints.set(location, {
-                condition,
-                hits: 0,
-                enabled: true
-            });
-        },
-        
-        addWatch(expression, callback = null) {
-            this.watches.set(expression, {
-                lastValue: undefined,
-                callback,
-                history: []
-            });
-        },
-        
-        pause() {
-            this.isPaused = true;
-            this._logDebugState();
-            debugger; // Native debugger integration
-        },
-        
-        resume() {
-            this.isPaused = false;
-            this.stepMode = false;
-        },
-        
-        stepOver() {
-            this.stepMode = true;
-            this.resume();
-        },
-        
-        stepInto() {
-            this.stepMode = true;
-            this.resume();
-        },
-        
-        stepOut() {
-            if (this.callStack.length > 0) {
-                const currentFrame = this.callStack[this.callStack.length - 1];
-                this._setTemporaryBreakpoint(currentFrame.caller);
+            setupAntiDetection() { 
+                console.log('Setting up anti-detection...');
+                return true; 
+            },
+            hideFromDebugger() { 
+                console.log('Hiding from debugger...');
+                return true; 
+            },
+            obfuscateMemory() { 
+                console.log('Obfuscating memory...');
+                return true; 
             }
-            this.resume();
-        },
-        
-        evaluateExpression(expression) {
-            try {
-                const result = eval(expression);
-                return {
-                    success: true,
-                    value: result,
-                    type: typeof result
-                };
-            } catch (error) {
-                return {
-                    success: false,
-                    error: error.message
-                };
-            }
-        },
-        
-        _logDebugState() {
-            console.group('Debug State');
-            console.log('Call Stack:', this.callStack);
-            console.log('Breakpoints:', Array.from(this.breakpoints.entries()));
-            console.log('Watches:', Array.from(this.watches.entries()));
-            console.groupEnd();
-        },
-        
-        _setTemporaryBreakpoint(location) {
-            const tempBreakpoint = {
-                condition: null,
-                hits: 0,
-                enabled: true,
-                temporary: true
-            };
-            this.breakpoints.set(location, tempBreakpoint);
-        },
-        
-        _checkBreakpoint(location) {
-            const breakpoint = this.breakpoints.get(location);
-            if (!breakpoint || !breakpoint.enabled) return false;
-            
-            breakpoint.hits++;
-            
-            if (breakpoint.temporary) {
-                this.breakpoints.delete(location);
-            }
-            
-            if (breakpoint.condition) {
-                try {
-                    return eval(breakpoint.condition);
-                } catch {
-                    return false;
-                }
-            }
-            
-            return true;
-        },
-        
-        _updateWatches() {
-            for (const [expression, watch] of this.watches) {
-                try {
-                    const newValue = eval(expression);
-                    if (newValue !== watch.lastValue) {
-                        watch.history.push({
-                            timestamp: Date.now(),
-                            oldValue: watch.lastValue,
-                            newValue
-                        });
-                        watch.lastValue = newValue;
-                        
-                        if (watch.callback) {
-                            watch.callback(newValue, watch.history);
-                        }
-                    }
-                } catch (error) {
-                    console.warn(`Watch expression error: ${expression}`, error);
-                }
-            }
-        },
-        
-        _pushCallFrame(functionName, args, location) {
-            this.callStack.push({
-                function: functionName,
-                arguments: args,
-                location,
-                timestamp: Date.now()
-            });
-        },
-        
-        _popCallFrame() {
-            return this.callStack.pop();
-        }
-    };
-
-    // Help function
-    window.help = function() {
-        console.log('%c🎨 Advanced Canvas Toolkit v3.0 - Help Guide', 'color: #00ff00; font-size: 16px; font-weight: bold;');
-        console.log('%c═══════════════════════════════════════════════════════════════════', 'color: #00ff00;');
-        console.log('%cAvailable Commands:', 'color: #00ff00;');
-
-        const commands = {
-            'help()': 'Show this help message',
-            'startQuiz()': 'Start the quiz automation process',
-            'debugger.pause()': 'Pause execution and enter debug mode',
-            'debugger.resume()': 'Resume execution from debug mode',
-            'debugger.stepOver()': 'Step over current line in debug mode',
-            'debugger.stepInto()': 'Step into function call in debug mode',
-            'debugger.stepOut()': 'Step out of current function in debug mode',
-            'debugger.addWatch("expression")': 'Add a watch expression',
-            'debugger.setBreakpoint("location")': 'Set a breakpoint',
-            'canvas.applyFilter("filterType", options)': 'Apply a filter to the canvas',
-            'performance.getMetrics()': 'Get performance metrics',
-            'logger.exportLogs()': 'Export educational logs'
         };
-
-        for (const [command, description] of Object.entries(commands)) {
-            console.log(`%c${command}`, 'color: #00ff00; font-weight: bold;');
-            console.log(`%c    ${description}`, 'color: #888888');
-            console.log('');
-        }
-
-        console.log('%cExamples:', 'color: #00ff00;');
-        console.log([
-            '// Apply a glitch effect to canvas',
-            'canvas.applyFilter("glitch", { intensity: 0.5 });',
-            '',
-            '// Set a conditional breakpoint',
-            'debugger.setBreakpoint("processQuestion", "score > 90");',
-            '',
-            '// Watch a variable',
-            'debugger.addWatch("currentQuestion.score");'
-        ].join('\n'));
-        console.log('%c═══════════════════════════════════════════════════════════════════', 'color: #00ff00;');
-    };
+    }
+    window.SecuritySystem = SecuritySystem;
 
     // Create global instance with enhanced security and visual effects
     const toolkit = new CanvasToolkit();
@@ -2051,15 +2577,16 @@ $$$$P d$$$$F $ $$$$$$$$$- $$$$$$
     
     // Enhanced startup command with visual effects
     window.startQuiz = async () => {
-        if (!toolkit.isEnabled) {
-            console.log('%cInitializing Toolkit...', 'color: #00ff00; font-size: 20px; font-weight: bold;');
-            console.log('%cHacking the mainframe...', 'color: #00ff00; font-size: 16px;');
+        try {
+            console.log('%cInitializing Toolkit...', 'color: #00ff00');
+            await toolkit.initialize();
             
-            try {
-                await toolkit.automateQuiz();
-            } catch (error) {
-                console.error('%cAutomation failed:', 'color: #ff0000; font-size: 16px;', error);
-            }
+            console.log('%cStarting quiz automation...', 'color: #00ff00');
+            await toolkit.automateQuiz();
+            
+            console.log('%cQuiz automation complete!', 'color: #00ff00');
+        } catch (error) {
+            console.error('Quiz automation failed:', error);
         }
     };
 
@@ -2088,7 +2615,7 @@ $$$$P d$$$$F $ $$$$$$$$$- $$$$$$
             "                   $   \"%*ebJLzb$e$$$$$b",
             "                    %..      4$$$$$$$$$$",
             "                     $$$e   z$$$$$$$$$$",
-            "                      \"*$c  \"$ $$$$$$$P\"",
+            "                      \"*$c  \"$ $$$$$$$$P\"",
             "                        \"\"\"*$$$$$$$\""
         ].join('\n');
 
@@ -2131,6 +2658,41 @@ $$$$P d$$$$F $ $$$$$$$$$- $$$$$$
     console.log('%c───────────────────────────────────────────', 'color: #00ff00;');
     console.log('%cFor more tools and updates, visit: TadashiJei.com', 'color: #00ff00; font-style: italic;');
     console.log('%cType startQuiz() to begin automation', 'color: #00ff00; font-weight: bold; font-size: 16px;');
+})();
+
+// Initialize MathJax configuration
+window.MathJax = {
+    tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true,
+        processEnvironments: true
+    },
+    options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+    }
+};
+
+// Initialize the toolkit
+(async function() {
+    try {
+        // Initialize all systems in parallel
+        await Promise.all([
+            SecuritySystem.init(),
+            MathAnalyzer.init(),
+            SolutionEngine.init(),
+            QuizAnalyzer.init(),
+            CollegeMathAnalyzer.init()
+        ]);
+        
+        // Initialize AutoSolver after other systems
+        await AutoSolver.init();
+        
+        console.log('%cCanvas Toolkit initialized successfully', 'color: #00ff00');
+    } catch (error) {
+        console.error('Failed to initialize toolkit:', error);
+        throw error;
+    }
 })();
 
 // Advanced Mathematical Analysis System
@@ -2206,32 +2768,31 @@ const MathAnalyzer = {
     // Show step-by-step solution
     showSteps(expr) {
         const steps = [];
-        let currentStep = expr.expression;
-
+        
         // Basic arithmetic steps
         if (expr.type === 'algebraic') {
             // Parentheses
             steps.push({
                 description: "Solve expressions in parentheses",
-                expression: currentStep
+                expression: expr.expression
             });
-
+            
             // Exponents
             steps.push({
                 description: "Evaluate exponents",
-                expression: currentStep
+                expression: expr.expression
             });
-
+            
             // Multiplication and Division
             steps.push({
                 description: "Perform multiplication and division from left to right",
-                expression: currentStep
+                expression: expr.expression
             });
-
+            
             // Addition and Subtraction
             steps.push({
                 description: "Perform addition and subtraction from left to right",
-                expression: currentStep
+                expression: expr.expression
             });
         }
 
@@ -2311,19 +2872,17 @@ Object.assign(ResultsDisplay, {
         styles.textContent = `
             #quiz-overlay {
                 position: fixed;
-                top: 0;
-                right: 0;
-                width: 400px;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.95);
+                bottom: 20px;
+                right: 20px;
+                background: rgba(0, 0, 0, 0.85);
                 color: #00ff00;
                 font-family: 'Courier New', monospace;
-                padding: 20px;
-                box-shadow: -2px 0 20px rgba(0, 255, 0, 0.4);
-                overflow-y: auto;
+                padding: 15px;
+                border-radius: 8px;
                 z-index: 9999;
-                border-left: 2px solid #00ff00;
-                transition: all 0.3s ease;
+                max-width: 400px;
+                display: none;
+                transition: opacity 0.3s ease;
             }
             .results-container {
                 height: 100%;
@@ -2444,14 +3003,8 @@ Object.assign(ResultsDisplay, {
                 text-shadow: 0 0 5px #00ff00;
             }
             @keyframes slideIn {
-                from {
-                    opacity: 0;
-                    transform: translateX(-20px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateX(0);
-                }
+                from { opacity: 0; transform: translateY(-20px); }
+                to { opacity: 1; transform: translateY(0); }
             }
             @keyframes shine {
                 0% { transform: translateX(-100%); }
@@ -2556,671 +3109,59 @@ Object.assign(ResultsDisplay, {
     }
 });
 
-// Advanced College Mathematics System
-const CollegeMathAnalyzer = {
-    // Initialize advanced math libraries
-    async init() {
-        if (!window.math) {
-            const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.4.4/math.js';
-            document.head.appendChild(script);
-            await new Promise(resolve => script.onload = resolve);
-        }
-    },
-
-    // Advanced Calculus Solver
-    solveCalculus(expr) {
-        const type = this.identifyCalculusType(expr);
-        switch(type) {
-            case 'multipleIntegral':
-                return this.solveMultipleIntegral(expr);
-            case 'vectorCalculus':
-                return this.solveVectorCalculus(expr);
-            case 'differentialEquation':
-                return this.solveDifferentialEquation(expr);
-            case 'series':
-                return this.analyzeSeries(expr);
-            case 'limit':
-                return this.evaluateLimit(expr);
-            default:
-                return this.solveBasicCalculus(expr);
-        }
-    },
-
-    // Linear Algebra Solver
-    solveLinearAlgebra(expr) {
-        const type = this.identifyLinearAlgebraType(expr);
-        switch(type) {
-            case 'matrix':
-                return this.solveMatrixOperation(expr);
-            case 'eigenvalue':
-                return this.findEigenvalues(expr);
-            case 'vectorSpace':
-                return this.analyzeVectorSpace(expr);
-            case 'linearTransformation':
-                return this.solveLinearTransformation(expr);
-            case 'systemEquations':
-                return this.solveSystemEquations(expr);
-            default:
-                return null;
-        }
-    },
-
-    // Advanced Algebra Solver
-    solveAdvancedAlgebra(expr) {
-        const type = this.identifyAlgebraType(expr);
-        switch(type) {
-            case 'group':
-                return this.solveGroupTheory(expr);
-            case 'ring':
-                return this.solveRingTheory(expr);
-            case 'field':
-                return this.solveFieldTheory(expr);
-            case 'galois':
-                return this.solveGaloisTheory(expr);
-            default:
-                return null;
-        }
-    },
-
-    // Complex Analysis Solver
-    solveComplexAnalysis(expr) {
-        const type = this.identifyComplexType(expr);
-        switch(type) {
-            case 'complexFunction':
-                return this.evaluateComplexFunction(expr);
-            case 'conformalMapping':
-                return this.solveConformalMapping(expr);
-            case 'residue':
-                return this.calculateResidue(expr);
-            case 'laurentSeries':
-                return this.expandLaurentSeries(expr);
-            case 'contourIntegral':
-                return this.evaluateContourIntegral(expr);
-            default:
-                return null;
-        }
-    },
-
-    // Differential Equations Solver
-    solveDifferentialEquations(expr) {
-        const type = this.identifyDEType(expr);
-        switch(type) {
-            case 'ode':
-                return this.solveODE(expr);
-            case 'pde':
-                return this.solvePDE(expr);
-            case 'boundaryValue':
-                return this.solveBoundaryValueProblem(expr);
-            case 'initialValue':
-                return this.solveInitialValueProblem(expr);
-            case 'system':
-                return this.solveSystemOfDEs(expr);
-            default:
-                return null;
-        }
-    },
-
-    // Specific Advanced Math Solvers
-    solveMultipleIntegral(expr) {
-        return {
-            type: 'multipleIntegral',
-            steps: [
-                { desc: "Set up integration bounds", expr: expr },
-                { desc: "Convert to iterated integral", expr: this.convertToIterated(expr) },
-                { desc: "Evaluate inner integral", expr: this.evaluateInner(expr) },
-                { desc: "Evaluate outer integral", expr: this.evaluateOuter(expr) }
-            ],
-            result: this.evaluateMultipleIntegral(expr)
-        };
-    },
-
-    solveVectorCalculus(expr) {
-        return {
-            type: 'vectorCalculus',
-            steps: [
-                { desc: "Identify vector field", expr: expr },
-                { desc: "Calculate gradient/divergence/curl", expr: this.calculateVectorField(expr) },
-                { desc: "Apply Stokes/Green/Gauss theorem", expr: this.applyVectorTheorem(expr) }
-            ],
-            result: this.evaluateVectorCalculus(expr)
-        };
-    },
-
-    findEigenvalues(matrix) {
-        return {
-            type: 'eigenvalue',
-            steps: [
-                { desc: "Set up characteristic equation", expr: this.getCharacteristicEquation(matrix) },
-                { desc: "Solve for eigenvalues", expr: this.solveCharacteristicEquation(matrix) },
-                { desc: "Find eigenvectors", expr: this.findEigenvectors(matrix) }
-            ],
-            result: this.calculateEigenSystem(matrix)
-        };
-    },
-
-    solveComplexFunction(expr) {
-        return {
-            type: 'complexFunction',
-            steps: [
-                { desc: "Identify singularities", expr: this.findSingularities(expr) },
-                { desc: "Calculate derivatives", expr: this.getComplexDerivative(expr) },
-                { desc: "Analyze behavior", expr: this.analyzeComplexBehavior(expr) }
-            ],
-            result: this.evaluateComplexFunction(expr)
-        };
-    },
-
-    // Helper Methods for Advanced Math
-    convertToIterated(expr) {
-        // Convert multiple integral to iterated form
-        return `∫∫ ${expr} dx dy`;
-    },
-
-    calculateVectorField(expr) {
-        // Calculate vector field operations
-        return `∇ × ${expr}`;
-    },
-
-    getCharacteristicEquation(matrix) {
-        // Get characteristic equation for eigenvalues
-        return `det(A - λI) = 0`;
-    },
-
-    findSingularities(expr) {
-        // Find singularities of complex function
-        return `z where ${expr} = ∞`;
-    },
-
-    // Pattern Recognition for Math Types
-    identifyCalculusType(expr) {
-        const patterns = {
-            multipleIntegral: /∫∫|∫∫∫/,
-            vectorCalculus: /∇|curl|div/,
-            differentialEquation: /\b(d[xyz]\/dt|∂[xyz]\/∂t)\b/,
-            series: /\bΣ\b|\b∑\b/,
-            limit: /\blim\b/
-        };
-        return this.matchPattern(expr, patterns);
-    },
-
-    identifyLinearAlgebraType(expr) {
-        const patterns = {
-            matrix: /\[.*\]/,
-            eigenvalue: /λ|eigenvalue/i,
-            vectorSpace: /span|basis/i,
-            linearTransformation: /transform/i,
-            systemEquations: /system|equations/i
-        };
-        return this.matchPattern(expr, patterns);
-    },
-
-    matchPattern(expr, patterns) {
-        for (const [type, pattern] of Object.entries(patterns)) {
-            if (pattern.test(expr)) return type;
-        }
-        return 'basic';
+// Initialize toolkit with display system
+window.initializeToolkit = async (config = {}) => {
+    try {
+        // Initialize toolkit
+        await toolkit.initialize();
+        ResultsDisplay.init();
+        console.log('Toolkit initialized successfully');
+        return true;
+    } catch (error) {
+        console.error('Failed to initialize toolkit:', error);
+        throw error;
     }
 };
 
-// Enhance QuizAnalyzer with college math capabilities
-Object.assign(QuizAnalyzer, {
-    async init() {
-        await Promise.all([
-            MathAnalyzer.init(),
-            CollegeMathAnalyzer.init(),
-            ResultsDisplay.init()
-        ]);
-        
-        // Add advanced math patterns
-        this.patterns.set('calculus', /∫|∂|∇|lim|∑/g);
-        this.patterns.set('linear_algebra', /matrix|eigen|vector/gi);
-        this.patterns.set('complex_analysis', /∮|∂z|∂z̄/g);
-        
-        console.log('%c[Quiz] Advanced mathematics analyzer initialized', 'color: #00ff00');
-        this.isActive = true;
-    },
+// Export toolkit for module usage
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        CanvasToolkit,
+        toolkit,
+        startQuiz
+    };
+}
 
-    async processImageData(imageData) {
-        const text = await ImageAnalyzer.analyzeImage(imageData);
-        const features = ImageAnalyzer.extractFeatures(imageData);
+// Initialize toolkit with enhanced security and visual effects
+async function initializeToolkit(config = {}) {
+    console.clear();
+    
+    try {
+        // Initialize core systems first
+        await SecuritySystem.init();
+        await MathAnalyzer.init();
         
-        // Advanced math analysis
-        const mathResults = [];
+        // Initialize display and visual effects
+        await ResultsDisplay.init();
+        await MatrixRain.init();
+        await GlitchEffect.init();
         
-        // Try different types of math analysis
-        if (this.patterns.get('calculus').test(text)) {
-            mathResults.push(await CollegeMathAnalyzer.solveCalculus(text));
-        }
-        if (this.patterns.get('linear_algebra').test(text)) {
-            mathResults.push(await CollegeMathAnalyzer.solveLinearAlgebra(text));
-        }
-        if (this.patterns.get('complex_analysis').test(text)) {
-            mathResults.push(await CollegeMathAnalyzer.solveComplexAnalysis(text));
-        }
+        // Initialize analysis systems
+        await QuizAnalyzer.init();
+        await SolutionEngine.init();
+        await PatternRecognition.init();
         
-        const results = {
-            imageText: text,
-            shapes: features.shapes,
-            colors: features.colors,
-            mathSteps: mathResults.length > 0 ? mathResults[0].steps : [],
-            answer: mathResults.length > 0 ? mathResults[0].result : 'No mathematical content detected',
-            confidence: 0.95,
-            mathType: mathResults.length > 0 ? mathResults[0].type : 'unknown'
-        };
-
-        // Update the visual display
-        ResultsDisplay.updateResults(results);
+        // Initialize protection systems
+        await FingerprintProtection.init();
+        await NetworkProtection.init();
         
-        return results;
+        console.log('%c[Toolkit] Initialization complete', 'color: #00ff00; font-weight: bold');
+        return true;
+    } catch (error) {
+        console.error('[Toolkit] Initialization failed:', error);
+        throw error;
     }
-});
+}
 
-// Advanced Security System
-const SecuritySystem = {
-    // Initialize security measures
-    init() {
-        this.setupAntiDetection();
-        this.hideFromDebugger();
-        this.obfuscateMemory();
-        this.setupProxyTraps();
-        this.initializeStealth();
-    },
-
-    // Anti-detection measures
-    setupAntiDetection() {
-        // Override key detection methods
-        Object.defineProperty(navigator, 'webdriver', {
-            get: () => false
-        });
-        Object.defineProperty(navigator, 'userAgent', {
-            get: () => this.generateRandomUA()
-        });
-        Object.defineProperty(navigator, 'platform', {
-            get: () => this.getRandomPlatform()
-        });
-        Object.defineProperty(navigator, 'hardwareConcurrency', {
-            get: () => Math.floor(Math.random() * 8) + 4
-        });
-        Object.defineProperty(navigator, 'deviceMemory', {
-            get: () => Math.floor(Math.random() * 8) + 4
-        });
-
-        // Mask canvas fingerprinting
-        const originalGetContext = HTMLCanvasElement.prototype.getContext;
-        HTMLCanvasElement.prototype.getContext = function() {
-            const context = originalGetContext.apply(this, arguments);
-            if (context && context.toString() === '[object CanvasRenderingContext2D]') {
-                return new Proxy(context, {
-                    get: (target, prop) => {
-                        if (prop === 'getImageData') {
-                            return function() {
-                                const imageData = target[prop].apply(target, arguments);
-                                // Add subtle noise to prevent fingerprinting
-                                for (let i = 0; i < imageData.data.length; i += 4) {
-                                    imageData.data[i] += (Math.random() - 0.5) * 0.01;
-                                }
-                                return imageData;
-                            };
-                        }
-                        return target[prop];
-                    }
-                });
-            }
-            return context;
-        };
-    },
-
-    // Hide from debugger
-    hideFromDebugger() {
-        const handler = {
-            get: (target, prop) => {
-                if (prop === 'toString') {
-                    return () => '[native code]';
-                }
-                return target[prop];
-            }
-        };
-
-        // Proxy all toolkit functions
-        const proxyFunction = (fn) => new Proxy(fn, handler);
-        Object.keys(this).forEach(key => {
-            if (typeof this[key] === 'function') {
-                this[key] = proxyFunction(this[key]);
-            }
-        });
-
-        // Hide stack traces
-        Error.stackTraceLimit = 0;
-        Error.prepareStackTrace = () => '';
-    },
-
-    // Memory obfuscation
-    obfuscateMemory() {
-        // Encrypt sensitive data in memory
-        const encrypt = (data) => {
-            const key = crypto.getRandomValues(new Uint8Array(32));
-            return { data: this.xorEncrypt(data, key), key };
-        };
-
-        // Store data in fragmented memory
-        this.memoryFragments = new Map();
-        this.storeSecurely = (data) => {
-            const { data: encrypted, key } = encrypt(data);
-            const id = crypto.randomUUID();
-            this.memoryFragments.set(id, { encrypted, key });
-            return id;
-        };
-    },
-
-    // Proxy traps for access control
-    setupProxyTraps() {
-        const createSecureProxy = (target) => {
-            return new Proxy(target, {
-                get: (obj, prop) => {
-                    // Randomize timing to prevent timing attacks
-                    const delay = Math.random() * 10;
-                    return new Promise(resolve => {
-                        setTimeout(() => {
-                            resolve(obj[prop]);
-                        }, delay);
-                    });
-                },
-                set: (obj, prop, value) => {
-                    // Encrypt values before storage
-                    obj[prop] = this.storeSecurely(value);
-                    return true;
-                }
-            });
-        };
-
-        // Apply proxy to all sensitive objects
-        this.secureObjects = new Map();
-        this.createSecureObject = (data) => {
-            const proxy = createSecureProxy(data);
-            this.secureObjects.set(proxy, data);
-            return proxy;
-        };
-    },
-
-    // Stealth mode initialization
-    initializeStealth() {
-        // Override console methods
-        const originalConsole = { ...console };
-        Object.keys(console).forEach(key => {
-            if (typeof console[key] === 'function') {
-                console[key] = (...args) => {
-                    // Filter out toolkit-related logs
-                    if (!args.some(arg => 
-                        String(arg).includes('canvas') || 
-                        String(arg).includes('quiz') ||
-                        String(arg).includes('analysis'))) {
-                        originalConsole[key].apply(console, args);
-                    }
-                };
-            }
-        });
-
-        // Hide from DevTools
-        setInterval(() => {
-            const devtools = /./;
-            devtools.toString = () => {
-                this.hideAllTraces();
-                return '[native code]';
-            };
-        }, 500);
-    },
-
-    // Clean up all traces
-    hideAllTraces() {
-        // Clear performance marks
-        if (window.performance && performance.getEntriesByType) {
-            performance.getEntriesByType('mark').forEach(mark => {
-                performance.clearMarks(mark.name);
-            });
-        }
-
-        // Clear storage
-        localStorage.clear();
-        sessionStorage.clear();
-
-        // Clear cookies
-        document.cookie.split(';').forEach(cookie => {
-            document.cookie = cookie.replace(/^ +/, '').replace(/=.*/, 
-                '=;expires=' + new Date().toUTCString() + ';path=/');
-        });
-    },
-
-    // Helper methods
-    generateRandomUA() {
-        const uas = [
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15',
-            'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36'
-        ];
-        return uas[Math.floor(Math.random() * uas.length)];
-    },
-
-    getRandomPlatform() {
-        return ['MacIntel', 'Win32', 'Linux x86_64'][Math.floor(Math.random() * 3)];
-    },
-
-    xorEncrypt(data, key) {
-        if (typeof data !== 'string') {
-            data = JSON.stringify(data);
-        }
-        const encrypted = new Uint8Array(data.length);
-        for (let i = 0; i < data.length; i++) {
-            encrypted[i] = data.charCodeAt(i) ^ key[i % key.length];
-        }
-        return encrypted;
-    }
-};
-
-// Initialize security system
-SecuritySystem.init();
-
-// Enhance QuizAnalyzer with security
-Object.assign(QuizAnalyzer, {
-    async init() {
-        // Initialize with security measures
-        SecuritySystem.init();
-        
-        // Secure initialization of components
-        await Promise.all([
-            this.secureInit(MathAnalyzer),
-            this.secureInit(CollegeMathAnalyzer),
-            this.secureInit(ResultsDisplay)
-        ]);
-        
-        // Add patterns through secure proxy
-        const securePatterns = SecuritySystem.createSecureObject(new Map([
-            ['calculus', /∫|∂|∇|lim|∑/g],
-            ['linear_algebra', /matrix|eigen|vector/gi],
-            ['complex_analysis', /∮|∂z|∂z̄/g]
-        ]));
-        
-        this.patterns = securePatterns;
-        this.isActive = true;
-    },
-
-    async secureInit(component) {
-        // Create secure proxy for component
-        const secureComponent = SecuritySystem.createSecureObject(component);
-        await secureComponent.init();
-        return secureComponent;
-    }
-});
-
-// Advanced Auto-Detection and Solution System
-const AutoSolver = {
-    init() {
-        this.setupDetectors();
-        this.initSolutionEngine();
-        this.setupBypass();
-    },
-
-    setupDetectors() {
-        // Monitor DOM changes for quiz content
-        const observer = new MutationObserver(mutations => {
-            mutations.forEach(mutation => {
-                if (this.isQuizContent(mutation.target)) {
-                    this.processQuizContent(mutation.target);
-                }
-            });
-        });
-
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true,
-            attributes: true
-        });
-    },
-
-    isQuizContent(element) {
-        return element.classList?.contains('quiz-content') ||
-               element.classList?.contains('question') ||
-               element.querySelector('.quiz-content, .question');
-    },
-
-    async processQuizContent(element) {
-        const questions = this.extractQuestions(element);
-        const solutions = await this.solveQuestions(questions);
-        this.injectSolutions(solutions);
-        this.saveToStorage(solutions);
-    },
-
-    extractQuestions(element) {
-        const questions = [];
-        const questionElements = element.querySelectorAll('.question, .problem');
-        
-        questionElements.forEach(q => {
-            const text = q.textContent;
-            const images = Array.from(q.querySelectorAll('img')).map(img => img.src);
-            const type = this.detectQuestionType(text);
-            questions.push({ text, images, type });
-        });
-
-        return questions;
-    },
-
-    detectQuestionType(text) {
-        const patterns = {
-            calculus: /∫|∂|∇|lim|dx|dy/,
-            algebra: /solve|equation|polynomial|factor/i,
-            geometry: /triangle|circle|angle|polygon/i,
-            statistics: /probability|mean|median|variance/i,
-            vectors: /vector|cross product|dot product/i
-        };
-
-        for (const [type, pattern] of Object.entries(patterns)) {
-            if (pattern.test(text)) return type;
-        }
-        
-        return 'general';
-    },
-
-    async solveQuestions(questions) {
-        return Promise.all(questions.map(async q => {
-            const solution = await this.generateSolution(q);
-            return {
-                question: q,
-                solution: solution,
-                steps: solution.steps,
-                confidence: solution.confidence
-            };
-        }));
-    },
-
-    async generateSolution(question) {
-        const { text, type } = question;
-        let solution;
-
-        switch(type) {
-            case 'calculus':
-                solution = await this.solveCalculus(text);
-                break;
-            case 'algebra':
-                solution = await this.solveAlgebra(text);
-                break;
-            case 'geometry':
-                solution = await this.solveGeometry(text);
-                break;
-            default:
-                solution = await this.solveGeneral(text);
-        }
-
-        return {
-            ...solution,
-            confidence: this.calculateConfidence(solution)
-        };
-    },
-
-    setupBypass() {
-        // Tab Detection Bypass
-        Object.defineProperty(document, 'hidden', {
-            get: () => false
-        });
-        Object.defineProperty(document, 'visibilityState', {
-            get: () => 'visible'
-        });
-
-        // Split Screen Detection Bypass
-        Object.defineProperty(window, 'outerHeight', {
-            get: () => window.innerHeight
-        });
-        Object.defineProperty(window, 'outerWidth', {
-            get: () => window.innerWidth
-        });
-
-        // Kiosk Mode Emulation
-        if (window.navigator) {
-            Object.defineProperty(navigator, 'userAgent', {
-                get: () => 'Mozilla/5.0 (iPad; CPU OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1'
-            });
-        }
-
-        // Activity Simulation
-        setInterval(() => {
-            this.simulateActivity();
-        }, Math.random() * 5000 + 2000);
-    },
-
-    simulateActivity() {
-        const events = ['mousemove', 'scroll', 'keypress'];
-        const randomEvent = events[Math.floor(Math.random() * events.length)];
-        
-        const event = new Event(randomEvent);
-        document.dispatchEvent(event);
-    },
-
-    saveToStorage(solutions) {
-        const encryptedData = SecuritySystem.xorEncrypt(
-            JSON.stringify(solutions),
-            this.getStorageKey()
-        );
-        
-        // Store in fragmented form
-        const fragments = this.fragmentData(encryptedData);
-        fragments.forEach((fragment, index) => {
-            const key = `_${Math.random().toString(36).substr(2, 9)}`;
-            localStorage.setItem(key, fragment);
-        });
-    },
-
-    fragmentData(data) {
-        const fragments = [];
-        const size = Math.ceil(data.length / 10);
-        for (let i = 0; i < data.length; i += size) {
-            fragments.push(data.slice(i, i + size));
-        }
-        return fragments;
-    },
-
-    getStorageKey() {
-        return crypto.getRandomValues(new Uint8Array(32));
-    }
-};
-
-// Initialize AutoSolver
-AutoSolver.init();
+// Auto-initialize when script loads
+initializeToolkit().catch(console.error);
